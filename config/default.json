@@ -7,7 +7,7 @@
   },
   "telemetry": {
     "logger": {
-      "level": "info",
+      "level": "debug",
       "prettyPrint": false
     }
   },
@@ -23,6 +23,36 @@
         "enabled": true,
         "options": null
       }
+    }
+  },
+  "tiles": {
+    "path": "/home/shlomiko/Desktop/bluemarble_4km/",
+    "format": "png"
+  },
+  "crypto": {
+    "readFileEncoding": "ascii",
+    "pem": "/tmp/key.pem",
+    "algoritm": "SHA512",
+    "signEncoding": "base64"
+  },
+  "queue": {
+    "jobManagerBaseUrl": "http://localhost:8082",
+    "heartbeatManagerBaseUrl": "http://localhost:8083",
+    "dequeueIntervalMs": 5000,
+    "heartbeatIntervalMs": 5000,
+    "jobType": "Sync",
+    "taskType": "Sync"
+  },
+  "db": {
+    "host": "localhost",
+    "user": "postgres",
+    "password": "postgres",
+    "database": "sync-storage",
+    "port": 5432,
+    "table": "config",
+    "columns": {
+      "data": "data",
+      "updatedTime": "updated_time"
     }
   }
 }

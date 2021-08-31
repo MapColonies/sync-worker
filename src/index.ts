@@ -7,8 +7,8 @@ import { Logger } from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
 import { get } from 'config';
 import { DEFAULT_SERVER_PORT, Services } from './common/constants';
-
 import { getApp } from './app';
+import { SyncManager } from './syncManager';
 
 interface IServerConfig {
   port: string;
@@ -20,9 +20,11 @@ const port: number = parseInt(serverConfig.port) || DEFAULT_SERVER_PORT;
 const app = getApp();
 
 const logger = container.resolve<Logger>(Services.LOGGER);
+const syncManager = container.resolve(SyncManager);
 const stubHealthcheck = async (): Promise<void> => Promise.resolve();
 const server = createTerminus(createServer(app), { healthChecks: { '/liveness': stubHealthcheck, onSignal: container.resolve('onSignal') } });
 
 server.listen(port, () => {
   logger.info(`app started on port ${port}`);
+  void syncManager.sync();
 });

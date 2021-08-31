@@ -38,5 +38,52 @@
         }
       }
     }
+  },
+  "tiles": {
+    "path": "TILES_PATH",
+    "format": "TILES_FORMAT"
+  },
+  "signature": {
+    "readFileEncoding": "SIGN_READ_FILE_ENCODING",
+    "pem": "SIGN_PEM",
+    "algoritm": "SIGN_ALOGRITM",
+    "signEncoding": "SIGN_OUTPUT_ENCODING"
+  },
+  "queue": {
+    "jobManagerBaseUrl": "QUEUE_JOB_MANAGER_BASE_URL",
+    "heartbeatManagerBaseUrl": "QUEUE_HEART_BEAT_MANAGER_BASE_URL",
+    "dequeueIntervalMs": {
+      "__name": "QUEUE_DEQUEUE_INTERVAL_MS",
+      "__format": "number"
+    },
+    "heartbeatIntervalMs": {
+      "__name": "QUEUE_HEART_BEAT_INTERVAL_MS",
+      "__format": "number"
+    },
+    "jobType": "QUEUE_JOB_TYPE",
+    "taskType": "QUEUE_TASK_TYPE"
+  },
+  "db": {
+    "host": "DB_HOST",
+    "port": {
+      "__name": "DB_PORT",
+      "__format": "number"
+    },
+    "user": "DB_USER",
+    "password": "DB_PASSWORD",
+    "database": "DB_NAME",
+    "enableSslAuth": {
+      "__name": "DB_SSL_ENABLE",
+      "__format": "boolean"
+    },
+    "rejectUnauthorized": {
+      "__name": "DB_REJECT_UNAUTHORIZED",
+      "__format": "boolean"
+    },
+    "sslPaths": {
+      "ca": "DB_SSL_CA",
+      "key": "DB_SSL_KEY",
+      "cert": "DB_SSL_CERT"
+    }
   }
 }

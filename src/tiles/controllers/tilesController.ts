@@ -6,28 +6,28 @@ import httpStatus from 'http-status-codes';
 import { injectable, inject } from 'tsyringe';
 import { Services } from '../../common/constants';
 
-import { IResourceNameModel, ResourceNameManager } from '../models/resourceNameManager';
+import { ITilesCountResponse, TilesManager } from '../models/tilesManager';
 
-type CreateResourceHandler = RequestHandler<undefined, IResourceNameModel, IResourceNameModel>;
-type GetResourceHandler = RequestHandler<undefined, IResourceNameModel>;
+type UpdateTilesCountHandler = RequestHandler<undefined, ITilesCountResponse, ITilesCountResponse>;
+type GetTilesCountHandler = RequestHandler<undefined, ITilesCountResponse>;
 
 @injectable()
-export class ResourceNameController {
+export class TilesController {
   private readonly createdResourceCounter: BoundCounter;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
-    @inject(ResourceNameManager) private readonly manager: ResourceNameManager,
+    @inject(TilesManager) private readonly manager: TilesManager,
     @inject(Services.METER) private readonly meter: Meter
   ) {
     this.createdResourceCounter = meter.createCounter('created_resource');
   }
 
-  public getResource: GetResourceHandler = (req, res) => {
-    return res.status(httpStatus.OK).json(this.manager.getResource());
+  public getTilesCount: GetTilesCountHandler = (req, res) => {
+    return res.status(httpStatus.OK).json(this.manager.getTilesCount());
   };
 
-  public createResource: CreateResourceHandler = (req, res) => {
+  public updateTilesCount: UpdateTilesCountHandler = (req, res) => {
     const createdResource = this.manager.createResource(req.body);
     this.createdResourceCounter.add(1);
     return res.status(httpStatus.CREATED).json(createdResource);
