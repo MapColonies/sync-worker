@@ -41,13 +41,17 @@
   },
   "tiles": {
     "path": "TILES_PATH",
-    "format": "TILES_FORMAT"
+    "format": "TILES_FORMAT",
+    "sigIsNeeded": {
+      "__name": "TILES_SIG_IS_NEEDED",
+      "__format": "boolean"
+    }
   },
-  "signature": {
-    "readFileEncoding": "SIGN_READ_FILE_ENCODING",
-    "pem": "SIGN_PEM",
-    "algoritm": "SIGN_ALOGRITM",
-    "signEncoding": "SIGN_OUTPUT_ENCODING"
+  "crypto": {
+    "readFileEncoding": "CRYPTO_READ_FILE_ENCODING",
+    "pem": "CRYPTO_PEM",
+    "algoritm": "CRYPTO_ALOGRITM",
+    "sigEncoding": "CRYPTO_SIG_ENCODING"
   },
   "queue": {
     "jobManagerBaseUrl": "QUEUE_JOB_MANAGER_BASE_URL",

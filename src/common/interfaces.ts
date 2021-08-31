@@ -21,6 +21,12 @@ export interface IQueueConfig {
   taskType: string;
 }
 
+export interface ITilesConfig {
+  path: string;
+  format: string;
+  sigIsNeeded: boolean;
+}
+
 export interface ICryptoConfig {
   readFileEncoding: BufferEncoding;
   pem: string;

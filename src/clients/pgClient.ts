@@ -1,4 +1,4 @@
-import { Pool, PoolConfig, Query, QueryResult } from 'pg';
+import { Pool, PoolConfig, QueryResult } from 'pg';
 import { inject, singleton } from 'tsyringe';
 import { Services } from '../common/constants';
 import { IDBConfig } from '../common/interfaces';
@@ -19,9 +19,9 @@ export class PgClient {
     this.pool = new Pool(this.pgConfig);
   }
 
-  public async execute(query: string): Promise<QueryResult<any>> {
+  public async execute(query: string): Promise<QueryResult> {
     const client = await this.pool.connect();
-    const queryResult = await client.query<Promise<QueryResult<any>>>(query);
+    const queryResult = await client.query<Promise<QueryResult>>(query);
     console.log(queryResult);
 
     return queryResult;

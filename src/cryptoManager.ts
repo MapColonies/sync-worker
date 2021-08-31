@@ -1,10 +1,14 @@
 import { promises as fsp } from 'fs';
-import crypto, { Cipher } from 'crypto';
+import crypto from 'crypto';
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
-import { QueueClient } from './clients/queueClient';
 import { Services } from './common/constants';
 import { ICryptoConfig } from './common/interfaces';
+
+interface IEncryptedHash {
+  iv: Buffer;
+  buffer: Buffer;
+}
 
 @singleton()
 export class CryptoManager {
@@ -15,44 +19,39 @@ export class CryptoManager {
     this.logger = logger;
   }
 
-  public encryptHash(key: string, fileHash: string): { iv: Buffer; buffer: Buffer } | undefined {
-    try {
-      const ivSize = 16;
-      const iv = Buffer.allocUnsafe(ivSize);
-      const cipher = crypto.createCipheriv('aes-256-cfb', Buffer.from(key, 'base64'), iv);
-      const buffer = cipher.update(fileHash);
+  public async generateSingedFile(fileHash: string, filePath: string): Promise<void> {
+    const hash = await this.computeHash(fileHash);
 
-      const obj = {
-        iv,
-        buffer,
-      };
-
-      return obj;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  private async computeHash(keyPath: string): Promise<Buffer | undefined> {
-    try {
-      const key = await fsp.readFile(keyPath, { encoding: 'binary' });
-      const hash = crypto.createHash('sha256');
-      hash.update(key);
-      return hash.digest();
-    } catch (error) {
-      this.logger.debug(`Failed to computeHash: ${(error as Error).message}`);
-    }
-  }
-
-  public async generateSingedFile(keyPath: string, filePath: string): Promise<void> {
-    const fileHash = await this.computeHash(filePath);
-    const key = await fsp.readFile(this.cryptoConfig.pem, { encoding: 'binary' });
-    if (fileHash) {
-      const encryptedHash = this.encryptHash(key, fileHash.toString());
+    if (hash !== undefined) {
+      const encryptedHash = this.encryptHash(hash);
       if (encryptedHash) {
-        await fsp.appendFile(filePath, encryptedHash.iv);
-        await fsp.appendFile(filePath, encryptedHash.buffer);
+        this.logger.debug(`appending iv and buffer into file: ${filePath}`);
+        await fsp.appendFile(filePath, encryptedHash.iv.toString('base64'));
+        await fsp.appendFile(filePath, encryptedHash.buffer.toString('base64'));
       }
     }
+  }
+
+  private async computeHash(keyPath: string): Promise<string | undefined> {
+    this.logger.debug('computing hash key');
+    const secret = await fsp.readFile(keyPath, { encoding: 'binary' });
+    const hash = crypto.createHash('sha256');
+    hash.update(String(secret));
+    return hash.digest('base64');
+  }
+
+  private encryptHash(fileHash: string): IEncryptedHash | undefined {
+    const ivSize = 16;
+    this.logger.debug('encrypting hash');
+    const iv = Buffer.allocUnsafe(ivSize);
+    const cipher = crypto.createCipheriv('aes-256-cfb', Buffer.from(fileHash, 'base64'), iv);
+    const buffer = cipher.update(fileHash);
+
+    const obj = {
+      iv,
+      buffer,
+    };
+
+    return obj;
   }
 }

@@ -26,14 +26,15 @@
     }
   },
   "tiles": {
-    "path": "/home/shlomiko/Desktop/bluemarble_4km/",
-    "format": "png"
+    "path": "/",
+    "format": "png",
+    "sigIsNeeded": true
   },
   "crypto": {
     "readFileEncoding": "ascii",
     "pem": "/tmp/key.pem",
     "algoritm": "SHA512",
-    "signEncoding": "base64"
+    "sigEncoding": "base64"
   },
   "queue": {
     "jobManagerBaseUrl": "http://localhost:8082",
@@ -48,11 +49,6 @@
     "user": "postgres",
     "password": "postgres",
     "database": "sync-storage",
-    "port": 5432,
-    "table": "config",
-    "columns": {
-      "data": "data",
-      "updatedTime": "updated_time"
-    }
+    "port": 5432
   }
 }

@@ -8,7 +8,7 @@ import { Services } from './common/constants';
 import { tracing } from './common/tracing';
 import { tilesRouterFactory, TILES_ROUTER_SYMBOL } from './tiles/routes/tilesRouter';
 import { InjectionObject, registerDependencies } from './common/dependencyRegistration';
-import { ICryptoConfig, IDBConfig, IQueueConfig } from './common/interfaces';
+import { ICryptoConfig, IDBConfig, IQueueConfig, ITilesConfig } from './common/interfaces';
 
 export interface RegisterOptions {
   override?: InjectionObject<unknown>[];
@@ -20,6 +20,7 @@ export const registerExternalValues = (options?: RegisterOptions): DependencyCon
   // @ts-expect-error the signature is wrong
   const logger = jsLogger({ ...loggerConfig, prettyPrint: loggerConfig.prettyPrint, hooks: { logMethod } });
   const queueConfig = config.get<IQueueConfig>('queue');
+  const tilesConfig = config.get<ITilesConfig>('tiles');
   const cryptoConfig = config.get<ICryptoConfig>('crypto');
   const dbConfig = config.get<IDBConfig>('db');
   const metrics = new Metrics('app');
@@ -33,6 +34,7 @@ export const registerExternalValues = (options?: RegisterOptions): DependencyCon
     { token: Services.LOGGER, provider: { useValue: logger } },
     { token: Services.DB_CONFIG, provider: { useValue: dbConfig } },
     { token: Services.QUEUE_CONFIG, provider: { useValue: queueConfig } },
+    { token: Services.TILES_CONFIG, provider: { useValue: tilesConfig } },
     { token: Services.CRYPTO_CONFIG, provider: { useValue: cryptoConfig } },
     { token: Services.TRACER, provider: { useValue: tracer } },
     { token: Services.METER, provider: { useValue: meter } },
