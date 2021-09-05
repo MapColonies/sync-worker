@@ -9,23 +9,17 @@ import { Logger } from '@map-colonies/js-logger';
 import httpLogger from '@map-colonies/express-access-log-middleware';
 import { Services } from './common/constants';
 import { IConfig } from './common/interfaces';
-import { TILES_ROUTER_SYMBOL } from './tiles/routes/tilesRouter';
 
 @injectable()
 export class ServerBuilder {
   private readonly serverInstance: express.Application;
 
-  public constructor(
-    @inject(Services.CONFIG) private readonly config: IConfig,
-    @inject(Services.LOGGER) private readonly logger: Logger,
-    @inject(TILES_ROUTER_SYMBOL) private readonly tilesRouter: Router
-  ) {
+  public constructor(@inject(Services.CONFIG) private readonly config: IConfig, @inject(Services.LOGGER) private readonly logger: Logger) {
     this.serverInstance = express();
   }
 
   public build(): express.Application {
     this.registerPreRoutesMiddleware();
-    this.buildRoutes();
     this.registerPostRoutesMiddleware();
 
     return this.serverInstance;
@@ -35,11 +29,6 @@ export class ServerBuilder {
     const openapiRouter = new OpenapiViewerRouter(this.config.get<OpenapiRouterConfig>('openapiConfig'));
     openapiRouter.setup();
     this.serverInstance.use(this.config.get<string>('openapiConfig.basePath'), openapiRouter.getRouter());
-  }
-
-  private buildRoutes(): void {
-    this.serverInstance.use('/', this.tilesRouter);
-    this.buildDocsRoutes();
   }
 
   private registerPreRoutesMiddleware(): void {

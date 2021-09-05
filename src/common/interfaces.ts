@@ -24,7 +24,12 @@ export interface IQueueConfig {
 export interface ITilesConfig {
   path: string;
   format: string;
+  uploadBatchSize: number;
   sigIsNeeded: boolean;
+}
+
+export interface IGatewayConfig {
+  url: string;
 }
 
 export interface ICryptoConfig {
@@ -32,19 +37,4 @@ export interface ICryptoConfig {
   pem: string;
   algoritm: string;
   signEncoding: HexBase64Latin1Encoding;
-}
-
-export interface IDBConfig {
-  host: string;
-  user: string;
-  database: string;
-  password: string;
-  port: number;
-  sslEnabled: boolean;
-  rejectUnauthorized: boolean;
-  sslPaths: {
-    ca: string;
-    key: string;
-    cert: string;
-  };
 }

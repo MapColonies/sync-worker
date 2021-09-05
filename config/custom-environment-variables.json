@@ -39,9 +39,22 @@
       }
     }
   },
+  "layerSpecBaseUrl": "LAYER_SPEC_BASE_URL",
+  "nifiBaseUrl": "NIFI_BASE_URL",
+  "syncAttempts": {
+    "__name": "SYNC_ATTEMPTS",
+    "__format": "number"
+  },
+  "gateway": {
+    "url": "GATEWAY_URL"
+  },
   "tiles": {
     "path": "TILES_PATH",
     "format": "TILES_FORMAT",
+    "uploadBatchSize": {
+      "__name": "TILEs_UPLOAD_BATCH_SIZE",
+      "__format": "boolean"
+    },
     "sigIsNeeded": {
       "__name": "TILES_SIG_IS_NEEDED",
       "__format": "boolean"
@@ -66,28 +79,5 @@
     },
     "jobType": "QUEUE_JOB_TYPE",
     "taskType": "QUEUE_TASK_TYPE"
-  },
-  "db": {
-    "host": "DB_HOST",
-    "port": {
-      "__name": "DB_PORT",
-      "__format": "number"
-    },
-    "user": "DB_USER",
-    "password": "DB_PASSWORD",
-    "database": "DB_NAME",
-    "enableSslAuth": {
-      "__name": "DB_SSL_ENABLE",
-      "__format": "boolean"
-    },
-    "rejectUnauthorized": {
-      "__name": "DB_REJECT_UNAUTHORIZED",
-      "__format": "boolean"
-    },
-    "sslPaths": {
-      "ca": "DB_SSL_CA",
-      "key": "DB_SSL_KEY",
-      "cert": "DB_SSL_CERT"
-    }
   }
 }

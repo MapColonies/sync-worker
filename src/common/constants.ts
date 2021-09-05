@@ -10,8 +10,8 @@ export enum Services {
   CONFIG = 'IConfig',
   TRACER = 'TRACER',
   METER = 'METER',
-  DB_CONFIG = 'IDBConfig',
   QUEUE_CONFIG = 'IQueueconfig',
   TILES_CONFIG = 'ITilesConfig',
   CRYPTO_CONFIG = 'ICryptoConfig',
+  GATEWAY_CONFIG = 'IGatewayConfig',
 }

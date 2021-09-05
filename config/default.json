@@ -12,7 +12,7 @@
     }
   },
   "server": {
-    "port": "8080",
+    "port": "8081",
     "request": {
       "payload": {
         "limit": "1mb"
@@ -25,9 +25,16 @@
       }
     }
   },
+  "layerSpecBaseUrl": "http://localhost:8080",
+  "nifiBaseUrl": "http://localhost:8081",
+  "syncAttempts": 5,
+  "gateway": {
+    "url": "http://localhost:6969"
+  },
   "tiles": {
-    "path": "/",
+    "path": "/home/shlomiko/Desktop",
     "format": "png",
+    "uploadBatchSize": 100,
     "sigIsNeeded": true
   },
   "crypto": {
@@ -44,11 +51,9 @@
     "jobType": "Sync",
     "taskType": "Sync"
   },
-  "db": {
-    "host": "localhost",
-    "user": "postgres",
-    "password": "postgres",
-    "database": "sync-storage",
-    "port": 5432
+  "httpRetry": {
+    "attempts": 5,
+    "delay": "exponential",
+    "shouldResetTimeout": true
   }
 }

@@ -26,5 +26,18 @@ const server = createTerminus(createServer(app), { healthChecks: { '/liveness': 
 
 server.listen(port, () => {
   logger.info(`app started on port ${port}`);
-  void syncManager.sync();
 });
+
+const mainLoop = async (): Promise<void> => {
+  const isRunning = true;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  while (isRunning) {
+    try {
+      await syncManager.runSync();
+    } catch (error) {
+      logger.error(`mainLoop: Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+    }
+  }
+};
+
+void mainLoop();

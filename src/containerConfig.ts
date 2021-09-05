@@ -6,9 +6,8 @@ import jsLogger, { LoggerOptions } from '@map-colonies/js-logger';
 import { Metrics } from '@map-colonies/telemetry';
 import { Services } from './common/constants';
 import { tracing } from './common/tracing';
-import { tilesRouterFactory, TILES_ROUTER_SYMBOL } from './tiles/routes/tilesRouter';
 import { InjectionObject, registerDependencies } from './common/dependencyRegistration';
-import { ICryptoConfig, IDBConfig, IQueueConfig, ITilesConfig } from './common/interfaces';
+import { ICryptoConfig, IGatewayConfig, IQueueConfig, ITilesConfig } from './common/interfaces';
 
 export interface RegisterOptions {
   override?: InjectionObject<unknown>[];
@@ -21,8 +20,8 @@ export const registerExternalValues = (options?: RegisterOptions): DependencyCon
   const logger = jsLogger({ ...loggerConfig, prettyPrint: loggerConfig.prettyPrint, hooks: { logMethod } });
   const queueConfig = config.get<IQueueConfig>('queue');
   const tilesConfig = config.get<ITilesConfig>('tiles');
+  const gatewayConfig = config.get<IGatewayConfig>('gateway');
   const cryptoConfig = config.get<ICryptoConfig>('crypto');
-  const dbConfig = config.get<IDBConfig>('db');
   const metrics = new Metrics('app');
   const meter = metrics.start();
 
@@ -32,13 +31,12 @@ export const registerExternalValues = (options?: RegisterOptions): DependencyCon
   const dependencies: InjectionObject<unknown>[] = [
     { token: Services.CONFIG, provider: { useValue: config } },
     { token: Services.LOGGER, provider: { useValue: logger } },
-    { token: Services.DB_CONFIG, provider: { useValue: dbConfig } },
     { token: Services.QUEUE_CONFIG, provider: { useValue: queueConfig } },
     { token: Services.TILES_CONFIG, provider: { useValue: tilesConfig } },
+    { token: Services.GATEWAY_CONFIG, provider: { useValue: gatewayConfig } },
     { token: Services.CRYPTO_CONFIG, provider: { useValue: cryptoConfig } },
     { token: Services.TRACER, provider: { useValue: tracer } },
     { token: Services.METER, provider: { useValue: meter } },
-    { token: TILES_ROUTER_SYMBOL, provider: { useFactory: tilesRouterFactory } },
     {
       token: 'onSignal',
       provider: {
