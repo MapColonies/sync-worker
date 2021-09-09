@@ -39,7 +39,7 @@
   },
   "crypto": {
     "readFileEncoding": "ascii",
-    "pem": "/tmp/key.pem",
+    "pem": "tests/mocks/files/invalidKey.pem",
     "algoritm": "SHA512",
     "sigEncoding": "base64"
   },

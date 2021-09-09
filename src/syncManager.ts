@@ -50,14 +50,15 @@ export class SyncManager {
 
   public async runSync(): Promise<void> {
     const task = await this.queueClient.queueHandler.waitForTask();
+    console.log('###', task);
     if (task) {
       const params = task.parameters as IParameters;
       const jobId = task.jobId;
       const taskId = task.id;
       const batch = params.batch;
       const attempts = task.attempts;
-      //const layerId = `${params.resourceId}-${params.resourceVersion}`;
-      const layerId = 'bluemarble_4km';
+      const layerId = `${params.resourceId}-${params.resourceVersion}`;
+      // const layerId = 'bluemarble_4km';
 
       if (attempts <= this.syncAttempts) {
         try {
@@ -66,6 +67,7 @@ export class SyncManager {
           let batchArray = [];
 
           for (const tile of generator) {
+            console.log(tile);
             const path = `${this.tilesConfig.path}/${layerId}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
             if (await isFileExists(path)) {
               batchArray.push(this.signAndUpload(tile, path));
@@ -78,7 +80,6 @@ export class SyncManager {
             // resolved left overs
             await Promise.all(batchArray);
           }
-          console.log(batchArray.length);
 
           await this.tilesManager.updateTilesCount(layerId, batchArray.length);
 
@@ -99,7 +100,6 @@ export class SyncManager {
       await this.cryptoManager.generateSingedFile(this.cryptoConfig.pem, path);
     }
     await this.tilesManager.uploadTile(tile, path);
-    return;
   }
 
   private async finishJob(jobId: string, layerId: string, isSuccess = true, errorReason: string | undefined = undefined): Promise<void> {

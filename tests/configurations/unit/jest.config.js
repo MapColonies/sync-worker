@@ -14,6 +14,9 @@ module.exports = {
     '!**/routes/**',
     '!<rootDir>/src/*',
   ],
+  moduleNameMapper: {
+    mockService: '<rootDir>/tests/__mocks__',
+  },
   coverageDirectory: '<rootDir>/coverage',
   reporters: [
     'default',
