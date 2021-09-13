@@ -3,8 +3,6 @@ import crypto from 'crypto';
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
 import { Services } from './common/constants';
-import { ICryptoConfig } from './common/interfaces';
-import { isFileExists } from './common/utils';
 
 interface IEncryptedHash {
   iv: Buffer;
@@ -17,7 +15,7 @@ export class CryptoManager {
     this.logger = logger;
   }
 
-  public async generateSingedFile(keyFilePath: string, filePath: string): Promise<void> {
+  public async generateSignedFile(keyFilePath: string, filePath: string): Promise<void> {
     try {
       const hash = await this.computeHash(keyFilePath);
 

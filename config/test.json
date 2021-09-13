@@ -8,5 +8,11 @@
   "queue": {
     "dequeueIntervalMs": 1000,
     "heartbeatIntervalMs": 1000
+  },
+  "crypto": {
+    "readFileEncoding": "ascii",
+    "pem": "tests/mocks/files/validKey.pem",
+    "algoritm": "SHA512",
+    "sigEncoding": "base64"
   }
 }

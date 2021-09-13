@@ -1,8 +1,7 @@
 import config from 'config';
-import { logMethod } from '@map-colonies/telemetry';
 import { trace } from '@opentelemetry/api';
 import { DependencyContainer } from 'tsyringe/dist/typings/types';
-import jsLogger, { LoggerOptions } from '@map-colonies/js-logger';
+import jsLogger from '@map-colonies/js-logger';
 import { Metrics } from '@map-colonies/telemetry';
 import { Services } from '../src/common/constants';
 import { tracing } from '../src/common/tracing';
@@ -15,7 +14,6 @@ export interface RegisterOptions {
 }
 
 export const registerExternalValues = (options?: RegisterOptions): DependencyContainer => {
-  const loggerConfig = config.get<LoggerOptions>('telemetry.logger');
   const logger = jsLogger({ enabled: false });
   const queueConfig = config.get<IQueueConfig>('queue');
   const tilesConfig = config.get<ITilesConfig>('tiles');

@@ -14,14 +14,14 @@ module.exports = {
     '!**/routes/**',
     '!<rootDir>/src/*',
   ],
-  moduleNameMapper: {
-    mockService: '<rootDir>/tests/__mocks__',
-  },
   coverageDirectory: '<rootDir>/coverage',
   reporters: [
     'default',
     ['jest-html-reporters', { multipleReportsUnitePath: './reports', pageTitle: 'unit', publicPath: './reports', filename: 'unit.html' }],
   ],
+  moduleNameMapper: {
+    mockService: '<rootDir>/tests/__mocks__',
+  },
   rootDir: '../../../.',
   setupFiles: ['<rootDir>/tests/configurations/jest.setup.js'],
   preset: 'ts-jest',

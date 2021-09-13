@@ -9,8 +9,7 @@ import { Services } from '../../common/constants';
 @singleton()
 export class GatewayClient extends HttpClient {
   public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.CONFIG) private readonly config: IConfig) {
-    super(logger, '', 'upload', config.get<IHttpRetryConfig>('httpRetry'));
-    this.axiosOptions.baseURL = config.get<string>('gateway.url');
+    super(logger, config.get<string>('gateway.url'), 'upload', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
   public async upload(filePath: string): Promise<void> {

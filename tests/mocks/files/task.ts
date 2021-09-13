@@ -1,14 +1,14 @@
 import { ITaskResponse, TaskStatus } from '@map-colonies/mc-priority-queue';
 
 const task: ITaskResponse = {
-  id: '2ca74c07-48dd-6cc2-t512-3f9ot62f52d7',
+  id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
   status: TaskStatus.PENDING,
   percentage: 0,
   description: '',
   created: '',
   reason: '',
   updated: '',
-  jobId: '1ca23d85-98cf-6c72-c836-3c9ot85t42d2',
+  jobId: '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed',
   attempts: 0,
   parameters: {
     resourceId: 'bluemarble',

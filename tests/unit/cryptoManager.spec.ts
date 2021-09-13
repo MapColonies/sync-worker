@@ -1,6 +1,5 @@
 import { promises as fsp } from 'fs';
 import crypto from 'crypto';
-import {} from '../mocks/crypto/cryptoMock';
 import jsLogger from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
 import { CryptoManager } from '../../src/cryptoManager';
@@ -42,7 +41,7 @@ describe('cryptoManager', () => {
     it('should successfully generate singed files', async function () {
       // action
       const action = async () => {
-        await cryptoManager.generateSingedFile(keyFile, mockFileToSign);
+        await cryptoManager.generateSignedFile(keyFile, mockFileToSign);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
@@ -56,7 +55,7 @@ describe('cryptoManager', () => {
       const notExistsKeyFilePath = '/mocks/files/keyNotExists.pem';
       // action
       const action = async () => {
-        await cryptoManager.generateSingedFile(notExistsKeyFilePath, mockFileToSign);
+        await cryptoManager.generateSignedFile(notExistsKeyFilePath, mockFileToSign);
       };
       // expectation;
       await expect(action).rejects.toThrow();
@@ -72,7 +71,7 @@ describe('cryptoManager', () => {
       });
       // action
       const action = async () => {
-        await cryptoManager.generateSingedFile(keyFile, mockFileToSign);
+        await cryptoManager.generateSignedFile(keyFile, mockFileToSign);
       };
       // expectation;
       await expect(action).rejects.toThrow();
@@ -88,7 +87,7 @@ describe('cryptoManager', () => {
       });
       // action
       const action = async () => {
-        await cryptoManager.generateSingedFile(keyFile, mockFileToSign);
+        await cryptoManager.generateSignedFile(keyFile, mockFileToSign);
       };
       // expectation;
       await expect(action).rejects.toThrow();
