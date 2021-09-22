@@ -52,7 +52,7 @@ describe('cryptoManager', () => {
       // expectation;
       await expect(action()).resolves.not.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(concatStub).toHaveBeenCalledTimes(3); // ***fsp.readFile contains a call to Bugger.concat() aswell***
+      expect(concatStub).toHaveBeenCalledTimes(3); // ***fsp.readFile contains a call to Buffer.concat() aswell***
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
 
@@ -84,7 +84,7 @@ describe('cryptoManager', () => {
       // expectation;
       await expect(action).rejects.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Bugger.concat() aswell***
+      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Buffer.concat() aswell***
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
