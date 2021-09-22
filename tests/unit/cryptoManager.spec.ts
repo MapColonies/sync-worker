@@ -79,6 +79,7 @@ describe('cryptoManager', () => {
       createHashStub.mockImplementation(() => {
         throw new Error();
       });
+      readFileStub.mockResolvedValue(mockKeyPem);
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
@@ -87,7 +88,7 @@ describe('cryptoManager', () => {
       // expectation;
       await expect(action).rejects.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Bugger.concat() aswell***
+      expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
