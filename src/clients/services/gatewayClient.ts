@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { inject, singleton } from 'tsyringe';
 import FormData from 'form-data';
 import { Logger } from '@map-colonies/js-logger';
@@ -9,12 +8,12 @@ import { Services } from '../../common/constants';
 @singleton()
 export class GatewayClient extends HttpClient {
   public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.CONFIG) private readonly config: IConfig) {
-    super(logger, config.get<string>('gateway.url'), 'upload', config.get<IHttpRetryConfig>('httpRetry'));
+    super(logger, config.get<string>('gateway.url'), 'GatewayClient', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
-  public async upload(filePath: string): Promise<void> {
+  public async upload(buffer: Buffer): Promise<void> {
     const formData = new FormData();
-    formData.append('photo', fs.createReadStream(filePath));
+    formData.append('photo', buffer, { filename: 'filename.png' });
     this.axiosOptions.headers = formData.getHeaders();
     await this.post(this.axiosOptions.baseURL as string, formData);
   }

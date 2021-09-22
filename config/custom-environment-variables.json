@@ -53,7 +53,7 @@
     "format": "TILES_FORMAT",
     "uploadBatchSize": {
       "__name": "TILEs_UPLOAD_BATCH_SIZE",
-      "__format": "boolean"
+      "__format": "number"
     },
     "sigIsNeeded": {
       "__name": "TILES_SIG_IS_NEEDED",

@@ -15,26 +15,22 @@ export class CryptoManager {
     this.logger = logger;
   }
 
-  public async generateSignedFile(keyFilePath: string, filePath: string): Promise<void> {
+  public async generateSignedFile(keyFilePath: string, filePath: string, buffer: Buffer): Promise<Buffer> {
     try {
       const hash = await this.computeHash(keyFilePath);
-
-      if (hash !== undefined) {
-        const encryptedHash = this.encryptHash(hash);
-        if (encryptedHash) {
-          this.logger.debug(`appending iv and signature into file: ${filePath}`);
-          await fsp.appendFile(filePath, encryptedHash.iv.toString('base64'));
-          await fsp.appendFile(filePath, encryptedHash.sig.toString('base64'));
-        }
-      }
+      const encryptedHash = this.encryptHash(hash);
+      this.logger.debug(`appending iv and signature into genereated file: ${filePath}`);
+      buffer = Buffer.concat([buffer, encryptedHash.iv]);
+      buffer = Buffer.concat([buffer, encryptedHash.sig]);
+      return buffer;
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.logger.error(`Failed to sign file: ${filePath} with error: ${error}`);
+      this.logger.error(`Failed to generate sign file: ${filePath} with error: ${error}`);
       throw error;
     }
   }
 
-  private async computeHash(keyFilePath: string): Promise<string | undefined> {
+  private async computeHash(keyFilePath: string): Promise<string> {
     this.logger.debug('computing hash key');
     const secret = await fsp.readFile(keyFilePath, { encoding: 'binary' });
     const hash = crypto.createHash('sha256');
@@ -43,7 +39,7 @@ export class CryptoManager {
     return hashKey;
   }
 
-  private encryptHash(fileHash: string): IEncryptedHash | undefined {
+  private encryptHash(fileHash: string): IEncryptedHash {
     const ivSize = 16;
     this.logger.debug('encrypting hash');
     const iv = Buffer.allocUnsafe(ivSize);

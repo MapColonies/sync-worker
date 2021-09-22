@@ -7,12 +7,12 @@
   },
   "telemetry": {
     "logger": {
-      "level": "debug",
+      "level": "info",
       "prettyPrint": false
     }
   },
   "server": {
-    "port": "8081",
+    "port": "8080",
     "request": {
       "payload": {
         "limit": "1mb"
@@ -29,17 +29,17 @@
   "nifiBaseUrl": "http://localhost:8081",
   "syncAttempts": 5,
   "gateway": {
-    "url": "http://localhost:6969"
+    "url": "http://localhost:8084"
   },
   "tiles": {
-    "path": "/home/shlomiko/Desktop",
+    "path": "/path/to/tiles/dir",
     "format": "png",
     "uploadBatchSize": 100,
     "sigIsNeeded": true
   },
   "crypto": {
     "readFileEncoding": "ascii",
-    "pem": "tests/mocks/files/invalidKey.pem",
+    "pem": "/path/to/key.pem",
     "algoritm": "SHA512",
     "sigEncoding": "base64"
   },

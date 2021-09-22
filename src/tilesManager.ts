@@ -16,9 +16,7 @@ export class TilesManager {
     @inject(Services.LOGGER) private readonly logger: Logger,
     private readonly gatewayClient: GatewayClient,
     private readonly layerSpecClient: LayerSpecClient
-  ) {
-    this.logger = logger;
-  }
+  ) {}
 
   public async updateTilesCount(layerId: string, tilesCount: number): Promise<void> {
     try {
@@ -30,12 +28,13 @@ export class TilesManager {
     }
   }
 
-  public async uploadTile(tile: ITile, path: string): Promise<void> {
+  public async uploadTile(tile: ITile, buffer: Buffer): Promise<void> {
     try {
-      await this.gatewayClient.upload(path);
+      await this.gatewayClient.upload(buffer);
     } catch (error) {
+      const path = `${tile.zoom}/${tile.x}/${tile.y}`;
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.logger.error(`upload failed for tile: ${tile.zoom}/${tile.x}/${tile.y} with error: ${error}`);
+      this.logger.error(`upload failed for tile: ${path} with error: ${error}`);
       throw error;
     }
   }

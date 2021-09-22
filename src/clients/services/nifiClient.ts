@@ -12,8 +12,7 @@ export interface OnSuccessUpdateRequest {
 @singleton()
 export class NifiClient extends HttpClient {
   public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.CONFIG) private readonly config: IConfig) {
-    super(logger, '', 'nifi', config.get<IHttpRetryConfig>('httpRetry'));
-    this.axiosOptions.baseURL = config.get<string>('nifiBaseUrl');
+    super(logger, config.get<string>('nifiBaseUrl'), 'NifiClient', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
   public async notifyNifiOnSuccess(jobId: string, layerId: string): Promise<void> {
@@ -21,7 +20,7 @@ export class NifiClient extends HttpClient {
       layerId: layerId,
       jobId: jobId,
     };
-
+    this.logger.info(`Updating Nifi on succes for jobId=${jobId}, layerId=${layerId}`);
     await this.post(`/`, body);
   }
 }

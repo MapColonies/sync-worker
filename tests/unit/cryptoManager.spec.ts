@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 import { CryptoManager } from '../../src/cryptoManager';
 
 // fsp module stubs
-let appendFileStub: jest.SpyInstance;
+let concatStub: jest.SpyInstance;
 let readFileStub: jest.SpyInstance;
 // crypto module stubs
 let createHashStub: jest.SpyInstance;
@@ -16,14 +16,19 @@ let cryptoManager: CryptoManager;
 const keyFile = 'tests/mocks/files/validKey.pem';
 const mockFileToSign = 'tests/mocks/files/mockTile.png';
 
+const getMockFileBuffer = (): Buffer => {
+  const fileBuffer = Buffer.from(['mockData']);
+  return fileBuffer;
+};
+
 describe('cryptoManager', () => {
   beforeAll(function () {
     cryptoManager = new CryptoManager(jsLogger({ enabled: false }));
   });
 
   beforeEach(function () {
-    // fsp spys
-    appendFileStub = jest.spyOn(fsp, 'appendFile').mockResolvedValue(undefined);
+    concatStub = jest.spyOn(Buffer, 'concat');
+    concatStub.mockImplementation(async () => Promise.resolve());
     readFileStub = jest.spyOn(fsp, 'readFile');
     // crpyto spys
     createHashStub = jest.spyOn(crypto, 'createHash');
@@ -41,12 +46,13 @@ describe('cryptoManager', () => {
     it('should successfully generate singed files', async function () {
       // action
       const action = async () => {
-        await cryptoManager.generateSignedFile(keyFile, mockFileToSign);
+        const fileBuffer = getMockFileBuffer();
+        await cryptoManager.generateSignedFile(keyFile, mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(appendFileStub).toHaveBeenCalledTimes(2);
+      expect(concatStub).toHaveBeenCalledTimes(3); // ***fsp.readFile contains a call to Bugger.concat() aswell***
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
 
@@ -55,12 +61,13 @@ describe('cryptoManager', () => {
       const notExistsKeyFilePath = '/mocks/files/keyNotExists.pem';
       // action
       const action = async () => {
-        await cryptoManager.generateSignedFile(notExistsKeyFilePath, mockFileToSign);
+        const fileBuffer = getMockFileBuffer();
+        await cryptoManager.generateSignedFile(notExistsKeyFilePath, mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action).rejects.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(appendFileStub).toHaveBeenCalledTimes(0);
+      expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
@@ -71,12 +78,13 @@ describe('cryptoManager', () => {
       });
       // action
       const action = async () => {
-        await cryptoManager.generateSignedFile(keyFile, mockFileToSign);
+        const fileBuffer = getMockFileBuffer();
+        await cryptoManager.generateSignedFile(keyFile, mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action).rejects.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(appendFileStub).toHaveBeenCalledTimes(0);
+      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Bugger.concat() aswell***
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
@@ -87,12 +95,13 @@ describe('cryptoManager', () => {
       });
       // action
       const action = async () => {
-        await cryptoManager.generateSignedFile(keyFile, mockFileToSign);
+        const fileBuffer = getMockFileBuffer();
+        await cryptoManager.generateSignedFile(keyFile, mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action).rejects.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(appendFileStub).toHaveBeenCalledTimes(0);
+      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Bugger.concat() aswell***
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
   });

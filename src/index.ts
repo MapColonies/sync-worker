@@ -9,6 +9,7 @@ import { get } from 'config';
 import { DEFAULT_SERVER_PORT, Services } from './common/constants';
 import { getApp } from './app';
 import { SyncManager } from './syncManager';
+import { ITilesConfig } from './common/interfaces';
 
 interface IServerConfig {
   port: string;
@@ -19,6 +20,7 @@ const port: number = parseInt(serverConfig.port) || DEFAULT_SERVER_PORT;
 
 const app = getApp();
 const logger = container.resolve<Logger>(Services.LOGGER);
+const tilesConfig = container.resolve<ITilesConfig>(Services.TILES_CONFIG);
 const syncManager = container.resolve(SyncManager);
 const stubHealthcheck = async (): Promise<void> => Promise.resolve();
 const server = createTerminus(createServer(app), { healthChecks: { '/liveness': stubHealthcheck, onSignal: container.resolve('onSignal') } });
@@ -32,6 +34,7 @@ const mainLoop = async (): Promise<void> => {
   //eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (isRunning) {
     try {
+      logger.debug(`tiles signature is set to: ${tilesConfig.sigIsNeeded.toString()}`);
       await syncManager.runSync();
     } catch (error) {
       logger.error(`mainLoop: Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);

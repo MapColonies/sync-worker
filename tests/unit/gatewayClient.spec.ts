@@ -1,4 +1,3 @@
-import fs from 'fs';
 import FormData from 'form-data';
 import { GatewayClient } from '../../src/clients/services/gatewayClient';
 import { registerExternalValues } from '../ testContainerConfig';
@@ -12,12 +11,16 @@ const axiosTestResponse = {
 };
 
 // fsp module stubs
-let createReadStreamStub: jest.SpyInstance;
 let appendStub: jest.SpyInstance;
 let gatewayClient: GatewayClient;
 
 const container = registerExternalValues();
-const mockFileToUpload = 'tests/mocks/files/mockTile.png';
+
+const getMockFileBuffer = (): Buffer => {
+  const fileBuffer = Buffer.from(['mockData']);
+  return fileBuffer;
+};
+
 describe('gatewayClient', () => {
   beforeAll(function () {
     initAxiosMock();
@@ -25,7 +28,6 @@ describe('gatewayClient', () => {
   });
 
   beforeEach(function () {
-    createReadStreamStub = jest.spyOn(fs, 'createReadStream');
     appendStub = jest.spyOn(FormData.prototype, 'append');
   });
 
@@ -39,13 +41,13 @@ describe('gatewayClient', () => {
   describe('#upload', () => {
     it('should successfully upload a file', async function () {
       axiosMocks.post.mockResolvedValue(axiosTestResponse);
+      const buffer = getMockFileBuffer();
       // action
       const action = async () => {
-        await gatewayClient.upload(mockFileToUpload);
+        await gatewayClient.upload(buffer);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
-      expect(createReadStreamStub).toHaveBeenCalledTimes(1);
       expect(appendStub).toHaveBeenCalledTimes(1);
       expect(axiosMocks.post).toHaveBeenCalledTimes(1);
     });

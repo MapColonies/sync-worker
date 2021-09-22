@@ -1,3 +1,4 @@
+import { promises as fsp } from 'fs';
 import { IConfig } from 'config';
 import { Logger } from '@map-colonies/js-logger';
 import { IUpdateJobRequestPayload, TaskStatus } from '@map-colonies/mc-priority-queue';
@@ -44,7 +45,6 @@ export class SyncManager {
     private readonly cryptoManager: CryptoManager,
     private readonly nifiClient: NifiClient
   ) {
-    this.logger = logger;
     this.syncAttempts = this.config.get<number>('syncAttempts');
   }
 
@@ -61,7 +61,7 @@ export class SyncManager {
 
       if (attempts <= this.syncAttempts) {
         try {
-          this.logger.debug(`tiles signature is set to: ${this.tilesConfig.sigIsNeeded.toString()}`);
+          this.logger.info(`Running sync task for taskId: ${task.id}, on jobId=${task.jobId}`);
           const generator = tilesGenerator(batch);
           let batchArray = [];
 
@@ -71,6 +71,7 @@ export class SyncManager {
             if (await isFileExists(path)) {
               batchArray.push(this.signAndUpload(tile, path));
             }
+
             if (batchArray.length === this.tilesConfig.uploadBatchSize) {
               await Promise.all(batchArray);
               await this.tilesManager.updateTilesCount(layerId, batchArray.length);
@@ -95,10 +96,11 @@ export class SyncManager {
   }
 
   private async signAndUpload(tile: ITile, path: string): Promise<void> {
+    let fileBuffer = await fsp.readFile(path);
     if (this.tilesConfig.sigIsNeeded) {
-      await this.cryptoManager.generateSignedFile(this.cryptoConfig.pem, path);
+      fileBuffer = await this.cryptoManager.generateSignedFile(this.cryptoConfig.pem, path, fileBuffer);
     }
-    await this.tilesManager.uploadTile(tile, path);
+    await this.tilesManager.uploadTile(tile, fileBuffer);
   }
 
   private async finishJob(jobId: string, layerId: string, isSuccess = true, errorReason: string | undefined = undefined): Promise<void> {

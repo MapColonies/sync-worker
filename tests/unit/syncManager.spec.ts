@@ -1,3 +1,4 @@
+import { promises as fsp } from 'fs';
 import jsLogger from '@map-colonies/js-logger';
 import * as tilesGenerator from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import { IUpdateJobRequestPayload, TaskStatus } from '@map-colonies/mc-priority-queue';
@@ -53,9 +54,11 @@ describe('syncManager', () => {
 
   beforeEach(() => {
     waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
-    generateSignedFileStub = jest.spyOn(cryptoManager, 'generateSignedFile').mockImplementationOnce(async () => Promise.resolve());
+    generateSignedFileStub = jest
+      .spyOn(cryptoManager, 'generateSignedFile')
+      .mockImplementation(async () => Buffer.from([await fsp.readFile('tests/mocks/tiles/bluemarble-1.0/0/0/1.png')]));
     uploadTilesStub = jest.spyOn(tilesManager, 'uploadTile').mockImplementation(async () => Promise.resolve());
-    updateTilesCountStub = jest.spyOn(tilesManager, 'updateTilesCount').mockImplementation(async () => Promise.resolve());
+    updateTilesCountStub = jest.spyOn(tilesManager, 'updateTilesCount');
     updateJobStub = jest.spyOn(JobManagerClient.prototype, 'updateJob').mockImplementation(async () => Promise.resolve());
     ackStub = jest.spyOn(queueClient.queueHandler, 'ack').mockImplementation(async () => Promise.resolve());
     rejectStub = jest.spyOn(queueClient.queueHandler, 'reject').mockImplementation(async () => Promise.resolve());

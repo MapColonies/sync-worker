@@ -11,14 +11,14 @@ interface ITilesCountUpdateRequest {
 @singleton()
 export class LayerSpecClient extends HttpClient {
   public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.CONFIG) private readonly config: IConfig) {
-    super(logger, '', 'layer-spec', config.get<IHttpRetryConfig>('httpRetry'));
-    this.axiosOptions.baseURL = config.get<string>('layerSpecBaseUrl');
+    super(logger, config.get<string>('layerSpecBaseUrl'), 'LayerSpecClient', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
   public async updateTilesCount(layerId: string, tilesCount: number): Promise<void> {
     const updateRequest: ITilesCountUpdateRequest = {
       tilesBatchCount: tilesCount,
     };
+    this.logger.info(`Updating ${tilesCount} tiles count layerId=${layerId}`);
     await this.put(`/tilesCount/${layerId}`, updateRequest);
   }
 }
