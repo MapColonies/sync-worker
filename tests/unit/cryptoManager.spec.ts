@@ -15,6 +15,7 @@ let cryptoManager: CryptoManager;
 
 const keyFile = 'tests/mocks/files/validKey.pem';
 const mockFileToSign = 'tests/mocks/files/mockTile.png';
+const mockKeyPem = '!%F=-?Pst970ss33445adfcF#-c3dafd';
 
 const getMockFileBuffer = (): Buffer => {
   const fileBuffer = Buffer.from(['mockData']);
@@ -44,6 +45,8 @@ describe('cryptoManager', () => {
 
   describe('#generateSingedFile', () => {
     it('should successfully generate singed files', async function () {
+      // mock
+      readFileStub.mockResolvedValue(mockKeyPem);
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
@@ -52,7 +55,7 @@ describe('cryptoManager', () => {
       // expectation;
       await expect(action()).resolves.not.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(concatStub).toHaveBeenCalledTimes(3); // ***fsp.readFile contains a call to Buffer.concat() aswell***
+      expect(concatStub).toHaveBeenCalledTimes(2);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
 
@@ -84,7 +87,7 @@ describe('cryptoManager', () => {
       // expectation;
       await expect(action).rejects.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Buffer.concat() aswell***
+      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Bugger.concat() aswell***
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
@@ -93,6 +96,7 @@ describe('cryptoManager', () => {
       createCipherivStub.mockImplementation(() => {
         throw new Error();
       });
+      readFileStub.mockResolvedValue(mockKeyPem);
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
@@ -101,7 +105,7 @@ describe('cryptoManager', () => {
       // expectation;
       await expect(action).rejects.toThrow();
       expect(readFileStub).toHaveBeenCalledTimes(1);
-      expect(concatStub).toHaveBeenCalledTimes(1); // ***fsp.readFile contains a call to Bugger.concat() aswell***
+      expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
   });
