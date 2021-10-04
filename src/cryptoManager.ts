@@ -39,7 +39,6 @@ export class CryptoManager {
   private async computeHash(filePath: string): Promise<Buffer> {
     const secret = await fsp.readFile(filePath, { encoding: 'binary' });
     const hash = crypto.createHash('sha512');
-    this.logger.debug(`computed hash key: ${hash}`);
     hash.update(String(secret));
     const hashKey = hash.digest();
     return hashKey;

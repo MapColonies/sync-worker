@@ -1,7 +1,6 @@
 import { promises as fsp } from 'fs';
 import { IConfig } from 'config';
 import { Logger } from '@map-colonies/js-logger';
-import { IUpdateJobRequestPayload, TaskStatus } from '@map-colonies/mc-priority-queue';
 import { inject, singleton } from 'tsyringe';
 import { tilesGenerator } from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import { QueueClient } from './clients/queueClient';

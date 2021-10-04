@@ -41,7 +41,7 @@ describe('nifiClient', () => {
       const layerId = `${params.resourceId}-${params.resourceVersion}`;
       // action
       const action = async () => {
-        await nifiClient.notifyNifiOnSuccess(task.jobId, layerId);
+        await nifiClient.notifyNifiOnComplete(task.jobId, layerId);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
