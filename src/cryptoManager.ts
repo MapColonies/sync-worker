@@ -1,8 +1,9 @@
-import { promises as fsp } from 'fs';
+import { promises as fsp, readFileSync } from 'fs';
 import crypto from 'crypto';
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
 import { Services } from './common/constants';
+import { ICryptoConfig } from './common/interfaces';
 
 interface IEncryptedHash {
   iv: Buffer;
@@ -11,14 +12,19 @@ interface IEncryptedHash {
 
 @singleton()
 export class CryptoManager {
-  public constructor(@inject(Services.LOGGER) private readonly logger: Logger) {
+  private readonly key: string;
+  public constructor(
+    @inject(Services.LOGGER) private readonly logger: Logger,
+    @inject(Services.CRYPTO_CONFIG) private readonly cryptoConfig: ICryptoConfig
+  ) {
     this.logger = logger;
+    this.key = readFileSync(this.cryptoConfig.pem, { encoding: 'utf8' });
   }
 
-  public async generateSignedFile(keyFilePath: string, filePath: string, buffer: Buffer): Promise<Buffer> {
+  public async generateSignedFile(filePath: string, buffer: Buffer): Promise<Buffer> {
     try {
-      const hash = await this.computeHash(keyFilePath);
-      const encryptedHash = this.encryptHash(hash);
+      const fileHash = await this.computeHash(filePath);
+      const encryptedHash = this.encryptHash(fileHash);
       this.logger.debug(`appending iv and signature into genereated file: ${filePath}`);
       buffer = Buffer.concat([buffer, encryptedHash.iv]);
       buffer = Buffer.concat([buffer, encryptedHash.sig]);
@@ -30,20 +36,19 @@ export class CryptoManager {
     }
   }
 
-  private async computeHash(keyFilePath: string): Promise<string> {
-    this.logger.debug('computing hash key');
-    const secret = await fsp.readFile(keyFilePath, { encoding: 'binary' });
-    const hash = crypto.createHash('sha256');
+  private async computeHash(filePath: string): Promise<Buffer> {
+    const secret = await fsp.readFile(filePath, { encoding: 'binary' });
+    const hash = crypto.createHash('sha512');
+    this.logger.debug(`computed hash key: ${hash}`);
     hash.update(String(secret));
-    const hashKey = hash.digest('base64');
+    const hashKey = hash.digest();
     return hashKey;
   }
 
-  private encryptHash(fileHash: string): IEncryptedHash {
+  private encryptHash(fileHash: Buffer): IEncryptedHash {
     const ivSize = 16;
-    this.logger.debug('encrypting hash');
     const iv = Buffer.allocUnsafe(ivSize);
-    const cipher = crypto.createCipheriv('aes-256-cfb', Buffer.from(fileHash, 'base64'), iv);
+    const cipher = crypto.createCipheriv('aes-256-cfb', this.key, iv);
     const sig = cipher.update(fileHash);
     const encryptedHash: IEncryptedHash = {
       iv,

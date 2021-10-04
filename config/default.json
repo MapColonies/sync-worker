@@ -7,12 +7,12 @@
   },
   "telemetry": {
     "logger": {
-      "level": "info",
+      "level": "debug",
       "prettyPrint": false
     }
   },
   "server": {
-    "port": "8080",
+    "port": "8088",
     "request": {
       "payload": {
         "limit": "1mb"
@@ -25,26 +25,26 @@
       }
     }
   },
-  "layerSpecBaseUrl": "http://localhost:8080",
+  "layerSpecBaseUrl": "http://10.45.130.11:8080",
   "nifiBaseUrl": "http://localhost:8081",
   "syncAttempts": 5,
   "gateway": {
     "url": "http://localhost:8084"
   },
   "tiles": {
-    "path": "/path/to/tiles/dir",
+    "path": "/home/shlomiko/Desktop/",
     "format": "png",
     "uploadBatchSize": 100,
     "sigIsNeeded": true
   },
   "crypto": {
     "readFileEncoding": "ascii",
-    "pem": "/path/to/key.pem",
+    "pem": "/home/shlomiko/Desktop/private_key.pem",
     "algoritm": "SHA512",
     "sigEncoding": "base64"
   },
   "queue": {
-    "jobManagerBaseUrl": "http://localhost:8082",
+    "jobManagerBaseUrl": "http://10.45.130.11:8082",
     "heartbeatManagerBaseUrl": "http://localhost:8083",
     "dequeueIntervalMs": 5000,
     "heartbeatIntervalMs": 5000,

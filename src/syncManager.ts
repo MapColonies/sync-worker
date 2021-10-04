@@ -77,20 +77,21 @@ export class SyncManager {
               await this.tilesManager.updateTilesCount(layerId, batchArray.length);
               batchArray = [];
             }
-            // resolved left overs
-            await Promise.all(batchArray);
           }
+          // resolved left overs
+          await Promise.all(batchArray);
 
           await this.tilesManager.updateTilesCount(layerId, batchArray.length);
 
           await this.queueClient.queueHandler.ack(jobId, taskId);
-          await this.finishJob(jobId, layerId);
+          await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         } catch (error) {
           await this.queueClient.queueHandler.reject(jobId, taskId, true, (error as Error).message);
+          await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         }
       } else {
         await this.queueClient.queueHandler.reject(jobId, taskId, false);
-        await this.finishJob(jobId, layerId, false);
+        await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
       }
     }
   }
@@ -98,21 +99,8 @@ export class SyncManager {
   private async signAndUpload(tile: ITile, path: string): Promise<void> {
     let fileBuffer = await fsp.readFile(path);
     if (this.tilesConfig.sigIsNeeded) {
-      fileBuffer = await this.cryptoManager.generateSignedFile(this.cryptoConfig.pem, path, fileBuffer);
+      fileBuffer = await this.cryptoManager.generateSignedFile(path, fileBuffer);
     }
     await this.tilesManager.uploadTile(tile, fileBuffer);
-  }
-
-  private async finishJob(jobId: string, layerId: string, isSuccess = true, errorReason: string | undefined = undefined): Promise<void> {
-    this.logger.info(`Update Job status to success=${String(isSuccess)} jobId=${jobId}`);
-    const joUpdatePayload: IUpdateJobRequestPayload = {
-      status: isSuccess ? TaskStatus.COMPLETED : TaskStatus.FAILED,
-      reason: errorReason,
-    };
-    await this.queueClient.queueHandler.jobManagerClient.updateJob(jobId, joUpdatePayload);
-    if (isSuccess) {
-      this.logger.info(`Update Nifi on success for jobId=${jobId}, layerId=${layerId}`);
-      await this.nifiClient.notifyNifiOnSuccess(jobId, layerId);
-    }
   }
 }

@@ -52,7 +52,7 @@
     "path": "TILES_PATH",
     "format": "TILES_FORMAT",
     "uploadBatchSize": {
-      "__name": "TILEs_UPLOAD_BATCH_SIZE",
+      "__name": "TILES_UPLOAD_BATCH_SIZE",
       "__format": "number"
     },
     "sigIsNeeded": {

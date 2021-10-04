@@ -5,52 +5,67 @@ global:
   environment: {}
 
 enabled: true
-environment: development
+environment: "development"
 replicaCount: 1
 initialDelaySeconds: 60
 nodePort: 30030 #for minikube deployment only
 
 cloudProvider:
-  dockerRegistryUrl: my-registry-url.io
-  flavor: openshift
+  dockerRegistryUrl: "10.45.130.11:5000"
+  flavor: "openshift"
 
 image:
-  repository: ts-server-boilerplate
-  tag: 'latest'
+  repository: "sync-worker"
+  tag: "latest"
+
+storage:
+  internalPvc:
+    enabled: true
+    name: internal-pvc
+    mountPath: /app/outputs
 
 env:
-  port: 8080
-  targetPort: 8080
+  port: 8089
+  targetPort: 8089
   protocol: TCP
-  logLevel: info
+  logLevel: debug
   logPrettyPrintEnabled: false
   responseCompressionEnabled: true
   requestPayloadLimit: 1mb
   tracing:
     enabled: false
-    url: http://localhost:55681/v1/trace
+    url: "http://localhost:55681/v1/trace"
   metrics:
     enabled: false
-    url: http://localhost:55681/v1/metrics
-
+    url: "http://localhost:55681/v1/metrics"
+  layerSpecBaseUrl: "http://10.45.130.11:8080"
+  nifiBaseUrl: "http://10.45.130.11:8083"
+  syncAttempts: 3
+  gatewayUrl: "http://10.45.130.11:8084"
+  tiles:
+    path: /
+    format: png
+    uploadBatchSize: 100
+    sigIsNeeded: false
+  crypto:
+    readFileEncoding: ""
+    pem: ""
+    algoritm: ""
+    sigEncoding: ""
+  queue:
+    jobManagerBaseUrl: "http://10.45.130.11:8082"
+    heartbeatManagerBaseUrl: "http://localhost:8085"
+    dequeueIntervalMs: 3
+    heartbeatIntervalMs: 0.5
+    jobType: "Sync"
+    taskType: "Sync"
 resources:
   enabled: false
   value:
     limits:
-      cpu: 100m
-      memory: 128Mi
+      cpu: "100m"
+      memory: "128Mi"
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: "100m"
+      memory: "128Mi"
 
-route:
-  enabled: true
-  path: /
-
-ingress:
-  enabled: false
-  path: /
-  host: 'localhost'
-  cors:
-    enabled: true
-    origin: '*'

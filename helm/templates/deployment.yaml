@@ -1,7 +1,7 @@
 {{- $releaseName := .Release.Name -}}
-{{- $chartName := include "ts-server-boilerplate.name" . -}}
-{{- $cloudProviderFlavor := include "ts-server-boilerplate.cloudProviderFlavor" . -}}
-{{- $cloudProviderDockerRegistryUrl := include "ts-server-boilerplate.cloudProviderDockerRegistryUrl" . -}}
+{{- $chartName := include "sync-worker.name" . -}}
+{{- $cloudProviderFlavor := include "sync-worker.cloudProviderFlavor" . -}}
+{{- $cloudProviderDockerRegistryUrl := include "sync-worker.cloudProviderDockerRegistryUrl" . -}}
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -10,9 +10,9 @@ metadata:
   labels:
     app: {{ $chartName }}
     component: {{ $chartName }}
-    environment: {{ include "ts-server-boilerplate.environment" . }}
+    environment: {{ include "sync-worker.environment" . }}
     release: {{ $releaseName }}
-    {{- include "ts-server-boilerplate.labels" . | nindent 4 }}
+    {{- include "sync-worker.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -20,15 +20,19 @@ spec:
       app: {{ $chartName }}
       release: {{ $releaseName }}
       run: {{ $releaseName }}-{{ $chartName }}
-      {{- include "ts-server-boilerplate.selectorLabels" . | nindent 6 }}
+      {{- include "sync-worker.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         app: {{ $chartName }}
         release: {{ $releaseName }}
         run: {{ $releaseName }}-{{ $chartName }}
-        {{- include "ts-server-boilerplate.selectorLabels" . | nindent 8 }}
+        {{- include "sync-worker.selectorLabels" . | nindent 8 }}
     spec:
+      volumes:
+      - name: internal-storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.storage.internalPvc.name }}
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
@@ -53,6 +57,10 @@ spec:
             httpGet:
               path: /liveness
               port: http
+          volumeMounts: 
+            - name: internal-storage
+              mountPath: {{ .Values.storage.internalPvc.mountPath }}
+              subPath: tiles
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}

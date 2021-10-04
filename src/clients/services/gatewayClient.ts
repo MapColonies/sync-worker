@@ -13,6 +13,7 @@ export class GatewayClient extends HttpClient {
 
   public async upload(buffer: Buffer): Promise<void> {
     const formData = new FormData();
+    // TODO: fix in integration
     formData.append('photo', buffer, { filename: 'filename.png' });
     this.axiosOptions.headers = formData.getHeaders();
     await this.post(this.axiosOptions.baseURL as string, formData);

@@ -15,12 +15,12 @@ export class NifiClient extends HttpClient {
     super(logger, config.get<string>('nifiBaseUrl'), 'NifiClient', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
-  public async notifyNifiOnSuccess(jobId: string, layerId: string): Promise<void> {
+  public async notifyNifiOnComplete(jobId: string, layerId: string): Promise<void> {
     const body: OnSuccessUpdateRequest = {
       layerId: layerId,
       jobId: jobId,
     };
-    this.logger.info(`Updating Nifi on succes for jobId=${jobId}, layerId=${layerId}`);
+    this.logger.info(`Updating Nifi on complete for jobId=${jobId} layerId=${layerId}`);
     await this.post(`/`, body);
   }
 }
