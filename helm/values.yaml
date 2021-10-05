@@ -12,7 +12,7 @@ nodePort: 30030 #for minikube deployment only
 
 cloudProvider:
   dockerRegistryUrl: "my-registry"
-  flavor: "openshift"
+  flavor: "azure"
 
 image:
   repository: "sync-worker"
