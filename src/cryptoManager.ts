@@ -18,7 +18,7 @@ export class CryptoManager {
     @inject(Services.CRYPTO_CONFIG) private readonly cryptoConfig: ICryptoConfig
   ) {
     this.logger = logger;
-    this.key = readFileSync(this.cryptoConfig.pem, { encoding: 'utf8' });
+    this.key = this.readKeyFile(this.cryptoConfig.pem);
   }
 
   public async generateSignedFile(filePath: string, buffer: Buffer): Promise<Buffer> {
@@ -49,11 +49,23 @@ export class CryptoManager {
     const iv = Buffer.allocUnsafe(ivSize);
     const cipher = crypto.createCipheriv('aes-256-cfb', this.key, iv);
     const sig = cipher.update(fileHash);
+
     const encryptedHash: IEncryptedHash = {
       iv,
       sig,
     };
 
     return encryptedHash;
+  }
+
+  private readKeyFile(filePath: string): string {
+    try {
+      const key = readFileSync(filePath, { encoding: 'utf8' });
+      return key;
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.logger.fatal(`Could not read key from provided file path: ${filePath}, error: ${error}`);
+      throw error;
+    }
   }
 }

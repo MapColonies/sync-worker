@@ -1,9 +1,7 @@
 import { promises as fsp } from 'fs';
 import jsLogger from '@map-colonies/js-logger';
 import * as tilesGenerator from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
-import { IUpdateJobRequestPayload, TaskStatus } from '@map-colonies/mc-priority-queue';
 import config from 'config';
-import { JobManagerClient } from '@map-colonies/mc-priority-queue';
 import { SyncManager } from '../../src/syncManager';
 import { task } from '../mocks/files/task';
 import { QueueClient } from '../../src/clients/queueClient';
@@ -18,12 +16,11 @@ let syncManager: SyncManager;
 let waitForTaskStub: jest.SpyInstance;
 let uploadTilesStub: jest.SpyInstance;
 let generateSignedFileStub: jest.SpyInstance;
-let updateJobStub: jest.SpyInstance;
 let updateTilesCountStub: jest.SpyInstance;
 let ackStub: jest.SpyInstance;
 let rejectStub: jest.SpyInstance;
 let tilesGeneratorStub: jest.SpyInstance;
-let notifyNifiOnSuccessStub: jest.SpyInstance;
+let notifyNifiOnCompleteStub: jest.SpyInstance;
 let isFileExistsStub: jest.SpyInstance;
 
 const container = registerExternalValues();
@@ -59,11 +56,10 @@ describe('syncManager', () => {
       .mockImplementation(async () => Buffer.from([await fsp.readFile('tests/mocks/tiles/bluemarble-1.0/0/0/1.png')]));
     uploadTilesStub = jest.spyOn(tilesManager, 'uploadTile').mockImplementation(async () => Promise.resolve());
     updateTilesCountStub = jest.spyOn(tilesManager, 'updateTilesCount');
-    updateJobStub = jest.spyOn(JobManagerClient.prototype, 'updateJob').mockImplementation(async () => Promise.resolve());
     ackStub = jest.spyOn(queueClient.queueHandler, 'ack').mockImplementation(async () => Promise.resolve());
     rejectStub = jest.spyOn(queueClient.queueHandler, 'reject').mockImplementation(async () => Promise.resolve());
     tilesGeneratorStub = jest.spyOn(tilesGenerator, 'tilesGenerator');
-    notifyNifiOnSuccessStub = jest.spyOn(nifiClient, 'notifyNifiOnSuccess').mockImplementation(async () => Promise.resolve());
+    notifyNifiOnCompleteStub = jest.spyOn(nifiClient, 'notifyNifiOnComplete').mockImplementation(async () => Promise.resolve());
     isFileExistsStub = jest.spyOn(utils, 'isFileExists');
   });
 
@@ -78,10 +74,6 @@ describe('syncManager', () => {
     it('should successfully sign and upload file', async function () {
       // mock
       isFileExistsStub.mockResolvedValueOnce(true);
-      const jobUpdatePayload: IUpdateJobRequestPayload = {
-        status: TaskStatus.COMPLETED,
-        reason: undefined,
-      };
 
       tilesGeneratorStub.mockImplementation(() => {
         if (waitForTaskStub.mock.calls.length !== 1) {
@@ -118,16 +110,9 @@ describe('syncManager', () => {
         return Promise.resolve();
       });
 
-      updateJobStub.mockImplementation(async () => {
+      notifyNifiOnCompleteStub.mockImplementation(async () => {
         if (ackStub.mock.calls.length !== 1) {
-          throw new Error('invalid call order: ack should be called before updateJob');
-        }
-        return Promise.resolve();
-      });
-
-      notifyNifiOnSuccessStub.mockImplementation(async () => {
-        if (updateJobStub.mock.calls.length !== 1) {
-          throw new Error('invalid call order: updateJob should be called before notifyNifiOnSuccess');
+          throw new Error('invalid call order: ack should be called before notifyNifiOnSuccess');
         }
         return Promise.resolve();
       });
@@ -142,24 +127,17 @@ describe('syncManager', () => {
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(1);
       expect(uploadTilesStub).toHaveBeenCalledTimes(1);
-      expect(updateJobStub).toHaveBeenCalledTimes(1);
       expect(ackStub).toHaveBeenCalledTimes(1);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(1);
-      expect(notifyNifiOnSuccessStub).toHaveBeenCalledTimes(1);
+      expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
       expect(rejectStub).toHaveBeenCalledTimes(0);
       expect(ackStub).toHaveBeenCalledWith(task.jobId, task.id);
-      expect(updateJobStub).toHaveBeenCalledWith(task.jobId, jobUpdatePayload);
     });
 
     it('should not sign and upload file if its not exists', async function () {
       // mock
       isFileExistsStub.mockResolvedValueOnce(false);
-      const jobUpdatePayload: IUpdateJobRequestPayload = {
-        status: TaskStatus.COMPLETED,
-        reason: undefined,
-      };
       tilesGeneratorStub.mockReturnValue(tilesArray);
-      isFileExistsStub.mockResolvedValueOnce(false);
       // action
       const action = async () => {
         await syncManager.runSync();
@@ -170,22 +148,16 @@ describe('syncManager', () => {
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(updateJobStub).toHaveBeenCalledTimes(1);
       expect(ackStub).toHaveBeenCalledTimes(1);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(1);
-      expect(notifyNifiOnSuccessStub).toHaveBeenCalledTimes(1);
+      expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
       expect(rejectStub).toHaveBeenCalledTimes(0);
       expect(ackStub).toHaveBeenCalledWith(task.jobId, task.id);
-      expect(updateJobStub).toHaveBeenCalledWith(task.jobId, jobUpdatePayload);
     });
 
     it('should reject task due max attempts', async function () {
       // mock
       isFileExistsStub.mockResolvedValueOnce(true);
-      const jobUpdatePayload: IUpdateJobRequestPayload = {
-        status: TaskStatus.FAILED,
-        reason: undefined,
-      };
       task.attempts = 6;
       isFileExistsStub.mockResolvedValue(true);
 
@@ -199,12 +171,10 @@ describe('syncManager', () => {
       expect(updateTilesCountStub).toHaveBeenCalledTimes(0);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(updateJobStub).toHaveBeenCalledTimes(1);
       expect(ackStub).toHaveBeenCalledTimes(0);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(0);
-      expect(notifyNifiOnSuccessStub).toHaveBeenCalledTimes(0);
+      expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
       expect(rejectStub).toHaveBeenCalledTimes(1);
-      expect(updateJobStub).toHaveBeenCalledWith(task.jobId, jobUpdatePayload);
       expect(rejectStub).toHaveBeenCalledWith(task.jobId, task.id, false);
     });
   });

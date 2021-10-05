@@ -1,8 +1,10 @@
 import { promises as fsp } from 'fs';
 import crypto from 'crypto';
+import config from 'config';
 import jsLogger from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
 import { CryptoManager } from '../../src/cryptoManager';
+import { ICryptoConfig } from '../../src/common/interfaces';
 
 // fsp module stubs
 let concatStub: jest.SpyInstance;
@@ -13,9 +15,9 @@ let createCipherivStub: jest.SpyInstance;
 
 let cryptoManager: CryptoManager;
 
-const keyFile = 'tests/mocks/files/validKey.pem';
 const mockFileToSign = 'tests/mocks/files/mockTile.png';
 const mockKeyPem = '!%F=-?Pst970ss33445adfcF#-c3dafd';
+const cryptoConfig = config.get<ICryptoConfig>('crypto');
 
 const getMockFileBuffer = (): Buffer => {
   const fileBuffer = Buffer.from(['mockData']);
@@ -24,7 +26,7 @@ const getMockFileBuffer = (): Buffer => {
 
 describe('cryptoManager', () => {
   beforeAll(function () {
-    cryptoManager = new CryptoManager(jsLogger({ enabled: false }));
+    cryptoManager = new CryptoManager(jsLogger({ enabled: false }), cryptoConfig);
   });
 
   beforeEach(function () {
@@ -50,7 +52,7 @@ describe('cryptoManager', () => {
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(keyFile, mockFileToSign, fileBuffer);
+        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
@@ -59,17 +61,21 @@ describe('cryptoManager', () => {
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
 
-    it('should reject generate singed files due key file is not exists', async function () {
+    it('should reject generate singed files due key file is not exists', function () {
       // mock
-      const notExistsKeyFilePath = '/mocks/files/keyNotExists.pem';
+      const mockCryptoConfig: ICryptoConfig = {
+        pem: 'invalid/path/to/private_key.pem',
+        readFileEncoding: 'ascii',
+        algoritm: 'SHA512',
+        signEncoding: 'base64',
+      };
       // action
-      const action = async () => {
-        const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(notExistsKeyFilePath, mockFileToSign, fileBuffer);
+      const action = () => {
+        cryptoManager = new CryptoManager(jsLogger({ enabled: false }), mockCryptoConfig);
       };
       // expectation;
-      await expect(action).rejects.toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(1);
+      expect(action).toThrow();
+      expect(readFileStub).toHaveBeenCalledTimes(0);
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
@@ -83,7 +89,7 @@ describe('cryptoManager', () => {
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(keyFile, mockFileToSign, fileBuffer);
+        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action).rejects.toThrow();
@@ -101,7 +107,7 @@ describe('cryptoManager', () => {
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(keyFile, mockFileToSign, fileBuffer);
+        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action).rejects.toThrow();
