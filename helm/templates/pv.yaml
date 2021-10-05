@@ -1,7 +1,8 @@
+{{- if .Values.storage.internalPvc.create -}}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: internal-pv
+  name: {{ .Values.storage.internalPv.name }}
 spec:
   storageClassName: host-path
   capacity:
@@ -9,4 +10,5 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /lol
+    path: {{ .Values.storage.internalPv.directory }}
+{{- end -}}

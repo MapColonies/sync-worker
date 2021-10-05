@@ -11,7 +11,7 @@ initialDelaySeconds: 60
 nodePort: 30030 #for minikube deployment only
 
 cloudProvider:
-  dockerRegistryUrl: "10.45.130.11:5000"
+  dockerRegistryUrl: "my-registry"
   flavor: "openshift"
 
 image:
@@ -20,9 +20,12 @@ image:
 
 storage:
   internalPvc:
-    enabled: true
-    name: internal-pvc
-    mountPath: /app/outputs
+    create: true
+    name: "internal-pvc"
+    mountPath: "/app/outputs"
+  internalPv:
+    name: "internal-pv"
+    directory: "/layerSources"
 
 env:
   port: 8089
@@ -38,10 +41,10 @@ env:
   metrics:
     enabled: false
     url: "http://localhost:55681/v1/metrics"
-  layerSpecBaseUrl: "http://10.45.130.11:8080"
-  nifiBaseUrl: "http://10.45.130.11:8083"
+  layerSpecBaseUrl: "http://localhost:8080"
+  nifiBaseUrl: "http://localhost:8083"
   syncAttempts: 3
-  gatewayUrl: "http://10.45.130.11:8084"
+  gatewayUrl: "http://localhost:8084"
   tiles:
     path: /
     format: png
@@ -53,7 +56,7 @@ env:
     algoritm: ""
     sigEncoding: ""
   queue:
-    jobManagerBaseUrl: "http://10.45.130.11:8082"
+    jobManagerBaseUrl: "http://localhost:8082"
     heartbeatManagerBaseUrl: "http://localhost:8085"
     dequeueIntervalMs: 3
     heartbeatIntervalMs: 0.5

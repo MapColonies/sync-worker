@@ -1,18 +1,17 @@
-
+{{- if .Values.storage.internalPvc.create -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: internal-pvc
+  name: {{ .Values.storage.internalPvc.name }}
   labels:
     app: "sync-worker"
-    component: discrete-ingestion
+    component: "sync-worker"
     environment: "development"
-    release: balbla 
 spec:
-
   storageClassName: host-path
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
+{{- end -}}
