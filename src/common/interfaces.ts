@@ -35,6 +35,6 @@ export interface IGatewayConfig {
 export interface ICryptoConfig {
   readFileEncoding: BufferEncoding;
   pem: string;
+  shaSize: string;
   algoritm: string;
-  signEncoding: HexBase64Latin1Encoding;
 }

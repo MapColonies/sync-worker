@@ -40,8 +40,8 @@
   "crypto": {
     "readFileEncoding": "ascii",
     "pem": "/path/to/private_key.pem",
-    "algoritm": "SHA512",
-    "sigEncoding": "base64"
+    "shaSize": "sha512",
+    "algoritm": "aes-256-cfb"
   },
   "queue": {
     "jobManagerBaseUrl": "http://localhost:8082",

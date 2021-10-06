@@ -38,7 +38,7 @@ export class CryptoManager {
 
   private async computeHash(filePath: string): Promise<Buffer> {
     const secret = await fsp.readFile(filePath, { encoding: 'binary' });
-    const hash = crypto.createHash('sha512');
+    const hash = crypto.createHash(this.cryptoConfig.shaSize);
     hash.update(String(secret));
     const hashKey = hash.digest();
     return hashKey;
@@ -47,7 +47,7 @@ export class CryptoManager {
   private encryptHash(fileHash: Buffer): IEncryptedHash {
     const ivSize = 16;
     const iv = Buffer.allocUnsafe(ivSize);
-    const cipher = crypto.createCipheriv('aes-256-cfb', this.key, iv);
+    const cipher = crypto.createCipheriv(this.cryptoConfig.algoritm, this.key, iv);
     const sig = cipher.update(fileHash);
 
     const encryptedHash: IEncryptedHash = {

@@ -16,6 +16,6 @@ export class GatewayClient extends HttpClient {
     // TODO: fix in integration
     formData.append('photo', buffer, { filename: 'filename.png' });
     this.axiosOptions.headers = formData.getHeaders();
-    await this.post(this.axiosOptions.baseURL as string, formData);
+    await this.post('/', formData);
   }
 }
