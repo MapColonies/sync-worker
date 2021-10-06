@@ -9,3 +9,30 @@ export interface OpenApiConfig {
   jsonPath: string;
   uiPath: string;
 }
+
+export interface IQueueConfig {
+  jobManagerBaseUrl: string;
+  heartbeatManagerBaseUrl: string;
+  dequeueIntervalMs: number;
+  heartbeatIntervalMs: number;
+  jobType: string;
+  taskType: string;
+}
+
+export interface ITilesConfig {
+  path: string;
+  format: string;
+  uploadBatchSize: number;
+  sigIsNeeded: boolean;
+}
+
+export interface IGatewayConfig {
+  url: string;
+}
+
+export interface ICryptoConfig {
+  readFileEncoding: BufferEncoding;
+  pem: string;
+  shaSize: string;
+  algoritm: string;
+}

@@ -1,0 +1,17 @@
+{{- if .Values.storage.internalPvc.create -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.storage.internalPvc.name }}
+  labels:
+    app: "sync-worker"
+    component: "sync-worker"
+    environment: "development"
+spec:
+  storageClassName: host-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+{{- end -}}

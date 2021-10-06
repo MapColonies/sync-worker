@@ -12,7 +12,7 @@
     }
   },
   "server": {
-    "port": "8080",
+    "port": "8088",
     "request": {
       "payload": {
         "limit": "1mb"
@@ -24,5 +24,36 @@
         "options": null
       }
     }
+  },
+  "layerSpecBaseUrl": "http://localhost:8080",
+  "nifiBaseUrl": "http://localhost:8081",
+  "syncAttempts": 5,
+  "gateway": {
+    "url": "http://localhost:8084"
+  },
+  "tiles": {
+    "path": "/path/to/tiles/directory",
+    "format": "png",
+    "uploadBatchSize": 100,
+    "sigIsNeeded": true
+  },
+  "crypto": {
+    "readFileEncoding": "ascii",
+    "pem": "/path/to/private_key.pem",
+    "shaSize": "sha512",
+    "algoritm": "aes-256-cfb"
+  },
+  "queue": {
+    "jobManagerBaseUrl": "http://localhost:8082",
+    "heartbeatManagerBaseUrl": "http://localhost:8083",
+    "dequeueIntervalMs": 5000,
+    "heartbeatIntervalMs": 5000,
+    "jobType": "Sync",
+    "taskType": "Sync"
+  },
+  "httpRetry": {
+    "attempts": 5,
+    "delay": "exponential",
+    "shouldResetTimeout": true
   }
 }

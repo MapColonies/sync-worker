@@ -2,11 +2,11 @@
 
 ----------------------------------
 
-![badge-alerts-lgtm](https://img.shields.io/lgtm/alerts/github/MapColonies/ts-server-boilerplate?style=for-the-badge)
+![badge-alerts-lgtm](https://img.shields.io/lgtm/alerts/github/MapColonies/sync-worker?style=for-the-badge)
 
-![grade-badge-lgtm](https://img.shields.io/lgtm/grade/javascript/github/MapColonies/ts-server-boilerplate?style=for-the-badge)
+![grade-badge-lgtm](https://img.shields.io/lgtm/grade/javascript/github/MapColonies/sync-worker?style=for-the-badge)
 
-![snyk](https://img.shields.io/snyk/vulnerabilities/github/MapColonies/ts-server-boilerplate?style=for-the-badge)
+![snyk](https://img.shields.io/snyk/vulnerabilities/github/MapColonies/sync-worker?style=for-the-badge)
 
 ----------------------------------
 

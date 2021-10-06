@@ -38,5 +38,43 @@
         }
       }
     }
+  },
+  "layerSpecBaseUrl": "LAYER_SPEC_BASE_URL",
+  "nifiBaseUrl": "NIFI_BASE_URL",
+  "syncAttempts": {
+    "__name": "SYNC_ATTEMPTS",
+    "__format": "number"
+  },
+  "gateway": {
+    "url": "GATEWAY_URL"
+  },
+  "tiles": {
+    "path": "TILES_PATH",
+    "format": "TILES_FORMAT",
+    "uploadBatchSize": {
+      "__name": "TILES_UPLOAD_BATCH_SIZE",
+      "__format": "number"
+    },
+    "sigIsNeeded": {
+      "__name": "TILES_SIG_IS_NEEDED",
+      "__format": "boolean"
+    }
+  },
+  "crypto": {
+    "pem": "CRYPTO_PEM"
+  },
+  "queue": {
+    "jobManagerBaseUrl": "QUEUE_JOB_MANAGER_BASE_URL",
+    "heartbeatManagerBaseUrl": "QUEUE_HEART_BEAT_MANAGER_BASE_URL",
+    "dequeueIntervalMs": {
+      "__name": "QUEUE_DEQUEUE_INTERVAL_MS",
+      "__format": "number"
+    },
+    "heartbeatIntervalMs": {
+      "__name": "QUEUE_HEART_BEAT_INTERVAL_MS",
+      "__format": "number"
+    },
+    "jobType": "QUEUE_JOB_TYPE",
+    "taskType": "QUEUE_TASK_TYPE"
   }
 }
