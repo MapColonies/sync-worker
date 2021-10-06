@@ -12,7 +12,7 @@
   "crypto": {
     "readFileEncoding": "ascii",
     "pem": "tests/mocks/files/validKey.pem",
-    "algoritm": "SHA512",
-    "sigEncoding": "base64"
+    "shaSize": "sha512",
+    "algoritm": "aes-256-cfb"
   }
 }

@@ -1,5 +1,3 @@
-type HexBase64Latin1Encoding = 'latin1' | 'hex' | 'base64';
-
 export interface IConfig {
   get: <T>(setting: string) => T;
   has: (setting: string) => boolean;
