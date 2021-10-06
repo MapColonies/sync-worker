@@ -66,8 +66,8 @@ describe('cryptoManager', () => {
       const mockCryptoConfig: ICryptoConfig = {
         pem: 'invalid/path/to/private_key.pem',
         readFileEncoding: 'ascii',
-        algoritm: 'SHA512',
-        signEncoding: 'base64',
+        shaSize: 'SHA512',
+        algoritm: 'aes-256-cfb',
       };
       // action
       const action = () => {
