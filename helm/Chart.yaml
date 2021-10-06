@@ -1,6 +1,6 @@
 apiVersion: v2
-name: "sync-worker"
-description: "A Helm chart for sync-worker service"
+name: sync-worker
+description: A Helm chart for sync-worker service
 type: application
-version: 1.0.0
-appVersion: 1.0.0
+version: 1.1.0
+appVersion: 1.1.0
