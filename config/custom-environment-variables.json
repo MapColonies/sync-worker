@@ -61,10 +61,7 @@
     }
   },
   "crypto": {
-    "readFileEncoding": "CRYPTO_READ_FILE_ENCODING",
-    "pem": "CRYPTO_PEM",
-    "algoritm": "CRYPTO_ALOGRITM",
-    "sigEncoding": "CRYPTO_SIG_ENCODING"
+    "pem": "CRYPTO_PEM"
   },
   "queue": {
     "jobManagerBaseUrl": "QUEUE_JOB_MANAGER_BASE_URL",

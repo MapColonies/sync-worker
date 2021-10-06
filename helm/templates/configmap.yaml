@@ -27,10 +27,7 @@ data:
   TILES_PATH: {{ .Values.env.tiles.path | quote }}
   TILES_UPLOAD_BATCH_SIZE: {{ .Values.env.tiles.uploadBatchSize | quote }}
   TILES_SIG_IS_NEEDED: {{ .Values.env.tiles.sigIsNeeded | quote }}
-  CRYPTO_READ_FILE_ENCODING: {{ .Values.env.crypto.readFileEncoding | quote }}
   CRYPTO_PEM: {{ .Values.env.crypto.pem | quote }}
-  CRYPTO_ALOGRITM: {{ .Values.env.crypto.algoritm | quote }}
-  CRYPTO_SIG_ENCODING: {{ .Values.env.crypto.sigEncoding | quote }}
   QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl | quote }}
   QUEUE_HEART_BEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatIntervalMs | quote }}
   QUEUE_DEQUEUE_INTERVAL_MS: {{ .Values.env.queue.dequeueIntervalMs | quote }}
