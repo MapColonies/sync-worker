@@ -29,7 +29,8 @@
   "nifiBaseUrl": "http://localhost:8081",
   "syncAttempts": 5,
   "gateway": {
-    "url": "http://localhost:8084"
+    "url": "http://localhost:8084",
+    "routeId": ""
   },
   "tiles": {
     "path": "/path/to/tiles/directory",

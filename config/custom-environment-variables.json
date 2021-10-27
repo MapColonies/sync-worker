@@ -46,7 +46,8 @@
     "__format": "number"
   },
   "gateway": {
-    "url": "GATEWAY_URL"
+    "url": "GATEWAY_URL",
+    "routeId": "GATEWAY_ROUTE_ID"
   },
   "tiles": {
     "path": "TILES_PATH",
