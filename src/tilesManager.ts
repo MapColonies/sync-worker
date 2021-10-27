@@ -32,6 +32,7 @@ export class TilesManager {
 
   public async uploadTile(tile: ITile, buffer: Buffer): Promise<void> {
     const format = this.tilesConfig.format;
+    //TODO: need to append to layer name
     const filename = `${tile.zoom}/${tile.x}/${tile.y}.${format}`;
     try {
       await this.gatewayClient.uploadBin(buffer, filename);
