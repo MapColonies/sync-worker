@@ -28,6 +28,7 @@ export interface ITilesConfig {
 
 export interface IGatewayConfig {
   url: string;
+  routeId: string;
 }
 
 export interface ICryptoConfig {

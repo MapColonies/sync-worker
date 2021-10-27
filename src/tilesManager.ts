@@ -3,6 +3,7 @@ import { inject, singleton } from 'tsyringe';
 import { GatewayClient } from './clients/services/gatewayClient';
 import { Services } from './common/constants';
 import { LayerSpecClient } from './clients/services/layerSpecClient';
+import { ITilesConfig } from './common/interfaces';
 
 interface ITile {
   x: number;
@@ -14,6 +15,7 @@ interface ITile {
 export class TilesManager {
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
+    @inject(Services.TILES_CONFIG) private readonly tilesConfig: ITilesConfig,
     private readonly gatewayClient: GatewayClient,
     private readonly layerSpecClient: LayerSpecClient
   ) {}
@@ -29,12 +31,13 @@ export class TilesManager {
   }
 
   public async uploadTile(tile: ITile, buffer: Buffer): Promise<void> {
+    const format = this.tilesConfig.format;
+    const filename = `${tile.zoom}/${tile.x}/${tile.y}.${format}`;
     try {
-      await this.gatewayClient.upload(buffer);
+      await this.gatewayClient.uploadBin(buffer, filename);
     } catch (error) {
-      const path = `${tile.zoom}/${tile.x}/${tile.y}`;
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.logger.error(`upload failed for tile: ${path} with error: ${error}`);
+      this.logger.error(`upload failed for tile: ${filename} with error: ${error}`);
       throw error;
     }
   }

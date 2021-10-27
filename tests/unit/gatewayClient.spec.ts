@@ -1,4 +1,3 @@
-import FormData from 'form-data';
 import { GatewayClient } from '../../src/clients/services/gatewayClient';
 import { registerExternalValues } from '../ testContainerConfig';
 import { axiosMocks, initAxiosMock } from '../mocks/axiosMock';
@@ -11,7 +10,6 @@ const axiosTestResponse = {
 };
 
 // fsp module stubs
-let appendStub: jest.SpyInstance;
 let gatewayClient: GatewayClient;
 
 const container = registerExternalValues();
@@ -27,10 +25,6 @@ describe('gatewayClient', () => {
     gatewayClient = container.resolve(GatewayClient);
   });
 
-  beforeEach(function () {
-    appendStub = jest.spyOn(FormData.prototype, 'append');
-  });
-
   afterEach(() => {
     container.reset();
     container.clearInstances();
@@ -41,14 +35,14 @@ describe('gatewayClient', () => {
   describe('#upload', () => {
     it('should successfully upload a file', async function () {
       axiosMocks.post.mockResolvedValue(axiosTestResponse);
+      const filename = '/4/4/4.png';
       const buffer = getMockFileBuffer();
       // action
       const action = async () => {
-        await gatewayClient.upload(buffer);
+        await gatewayClient.uploadBin(buffer, filename);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
-      expect(appendStub).toHaveBeenCalledTimes(1);
       expect(axiosMocks.post).toHaveBeenCalledTimes(1);
     });
   });

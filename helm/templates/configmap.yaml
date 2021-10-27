@@ -24,6 +24,7 @@ data:
   NIFI_BASE_URL: {{ .Values.env.nifiBaseUrl | quote }}
   SYNC_ATTEMPTS: {{ .Values.env.syncAttempts | quote }}
   GATEWAY_URL: {{ .Values.env.gatewayUrl | quote }}
+  GATEWAY_ROUTE_ID: {{ .Values.env.gatewayRouteId | quote }}
   TILES_PATH: {{ .Values.env.tiles.path | quote }}
   TILES_UPLOAD_BATCH_SIZE: {{ .Values.env.tiles.uploadBatchSize | quote }}
   TILES_SIG_IS_NEEDED: {{ .Values.env.tiles.sigIsNeeded | quote }}
