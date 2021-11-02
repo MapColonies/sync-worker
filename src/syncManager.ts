@@ -61,10 +61,11 @@ export class SyncManager {
           let batchArray = [];
 
           for (const tile of generator) {
-            const path = `${this.tilesConfig.path}/${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
+            const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
+            const fullPath = `${this.tilesConfig.path}/${tileRelativePath}`;
 
-            if (await isFileExists(path)) {
-              batchArray.push(this.signAndUpload(path));
+            if (await isFileExists(fullPath)) {
+              batchArray.push(this.signAndUpload(this.tilesConfig.path, tileRelativePath));
             }
 
             if (batchArray.length === this.tilesConfig.uploadBatchSize) {
@@ -91,11 +92,12 @@ export class SyncManager {
     }
   }
 
-  private async signAndUpload(path: string): Promise<void> {
-    let fileBuffer = await fsp.readFile(path);
+  private async signAndUpload(mountPath: string, tileRelativePath: string): Promise<void> {
+    const fullPath = `${mountPath}/${tileRelativePath}`;
+    let fileBuffer = await fsp.readFile(fullPath);
     if (this.tilesConfig.sigIsNeeded) {
-      fileBuffer = await this.cryptoManager.generateSignedFile(path, fileBuffer);
+      fileBuffer = await this.cryptoManager.generateSignedFile(fullPath, fileBuffer);
     }
-    await this.tilesManager.uploadTile(path, fileBuffer);
+    await this.tilesManager.uploadTile(tileRelativePath, fileBuffer);
   }
 }

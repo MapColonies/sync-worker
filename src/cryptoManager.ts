@@ -21,17 +21,17 @@ export class CryptoManager {
     this.key = this.readKeyFile(this.cryptoConfig.pem);
   }
 
-  public async generateSignedFile(filePath: string, buffer: Buffer): Promise<Buffer> {
+  public async generateSignedFile(fullPath: string, buffer: Buffer): Promise<Buffer> {
     try {
-      const fileHash = await this.computeHash(filePath);
+      const fileHash = await this.computeHash(fullPath);
       const encryptedHash = this.encryptHash(fileHash);
-      this.logger.debug(`appending iv and signature into genereated file: ${filePath}`);
+      this.logger.debug(`appending iv and signature into generated file from: ${fullPath}`);
       buffer = Buffer.concat([buffer, encryptedHash.iv]);
       buffer = Buffer.concat([buffer, encryptedHash.sig]);
       return buffer;
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.logger.error(`Failed to generate sign file: ${filePath} with error: ${error}`);
+      this.logger.error(`Failed to generate sign file: ${fullPath} with error: ${error}`);
       throw error;
     }
   }

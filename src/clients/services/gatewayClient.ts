@@ -16,7 +16,7 @@ export class GatewayClient extends HttpClient {
       'content-type': 'application/octet-stream',
     };
     const queryParams = {
-      filename: filename,
+      filename: encodeURIComponent(filename),
       routeId: routeId,
     };
     await this.post('/', buffer, queryParams);
