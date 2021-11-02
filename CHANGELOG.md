@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/MapColonies/sync-worker/compare/v1.1.0...v1.2.0) (2021-11-02)
+
+
+### Features
+
+* support relative layer path ([#3](https://github.com/MapColonies/sync-worker/issues/3)) ([95eee05](https://github.com/MapColonies/sync-worker/commit/95eee052d5cc744269a60bc493902d445b86b2f7))
+
+
+### Bug Fixes
+
+* added comment ([7f92434](https://github.com/MapColonies/sync-worker/commit/7f92434d22a99e1270f2fe0b657d3f421ca89fe8))
+* lint ignore on azure-pipelines ([4226a2b](https://github.com/MapColonies/sync-worker/commit/4226a2b0406c02bab159cbea4f14abcbda52c064))
+
 ## 1.1.0 (2021-10-06)
 
 
