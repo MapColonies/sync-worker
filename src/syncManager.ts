@@ -19,16 +19,11 @@ interface ITileRange {
   zoom: number;
 }
 
-interface ITile {
-  x: number;
-  y: number;
-  zoom: number;
-}
-
 interface IParameters {
   batch: ITileRange[];
   resourceId: string;
   resourceVersion: string;
+  layerRelativePath: string;
 }
 
 @singleton()
@@ -57,6 +52,7 @@ export class SyncManager {
       const batch = params.batch;
       const attempts = task.attempts;
       const layerId = `${params.resourceId}-${params.resourceVersion}`;
+      const layerRelativePath = params.layerRelativePath;
 
       if (attempts <= this.syncAttempts) {
         try {
@@ -65,10 +61,10 @@ export class SyncManager {
           let batchArray = [];
 
           for (const tile of generator) {
-            const path = `${this.tilesConfig.path}/${layerId}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
+            const path = `${this.tilesConfig.path}/${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
 
             if (await isFileExists(path)) {
-              batchArray.push(this.signAndUpload(tile, path));
+              batchArray.push(this.signAndUpload(path));
             }
 
             if (batchArray.length === this.tilesConfig.uploadBatchSize) {
@@ -95,11 +91,11 @@ export class SyncManager {
     }
   }
 
-  private async signAndUpload(tile: ITile, path: string): Promise<void> {
+  private async signAndUpload(path: string): Promise<void> {
     let fileBuffer = await fsp.readFile(path);
     if (this.tilesConfig.sigIsNeeded) {
       fileBuffer = await this.cryptoManager.generateSignedFile(path, fileBuffer);
     }
-    await this.tilesManager.uploadTile(tile, fileBuffer);
+    await this.tilesManager.uploadTile(path, fileBuffer);
   }
 }

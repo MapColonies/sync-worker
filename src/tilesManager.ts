@@ -5,12 +5,6 @@ import { Services } from './common/constants';
 import { LayerSpecClient } from './clients/services/layerSpecClient';
 import { ITilesConfig } from './common/interfaces';
 
-interface ITile {
-  x: number;
-  y: number;
-  zoom: number;
-}
-
 @singleton()
 export class TilesManager {
   public constructor(
@@ -30,15 +24,12 @@ export class TilesManager {
     }
   }
 
-  public async uploadTile(tile: ITile, buffer: Buffer): Promise<void> {
-    const format = this.tilesConfig.format;
-    //TODO: need to append to layer name
-    const filename = `${tile.zoom}/${tile.x}/${tile.y}.${format}`;
+  public async uploadTile(path: string, buffer: Buffer): Promise<void> {
     try {
-      await this.gatewayClient.uploadBin(buffer, filename);
+      await this.gatewayClient.uploadBin(buffer, path);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.logger.error(`upload failed for tile: ${filename} with error: ${error}`);
+      this.logger.error(`upload failed for tile: ${path} with error: ${error}`);
       throw error;
     }
   }
