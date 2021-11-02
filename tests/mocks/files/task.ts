@@ -11,8 +11,9 @@ const task: ITaskResponse = {
   jobId: '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed',
   attempts: 0,
   parameters: {
-    resourceId: 'bluemarble',
-    resourceVersion: '1.0',
+    resourceId: 'testId',
+    resourceVersion: 'testVersion',
+    layerRelativePath: 'testId/testVersion/testProductType',
     batch: [
       {
         maxX: 8,

@@ -1,3 +1,4 @@
+import path from 'path';
 import { promises as fsp } from 'fs';
 import { IConfig } from 'config';
 import { Logger } from '@map-colonies/js-logger';
@@ -19,21 +20,17 @@ interface ITileRange {
   zoom: number;
 }
 
-interface ITile {
-  x: number;
-  y: number;
-  zoom: number;
-}
-
 interface IParameters {
   batch: ITileRange[];
   resourceId: string;
   resourceVersion: string;
+  layerRelativePath: string;
 }
 
 @singleton()
 export class SyncManager {
   private readonly syncAttempts: number;
+
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
@@ -57,6 +54,7 @@ export class SyncManager {
       const batch = params.batch;
       const attempts = task.attempts;
       const layerId = `${params.resourceId}-${params.resourceVersion}`;
+      const layerRelativePath = params.layerRelativePath;
 
       if (attempts <= this.syncAttempts) {
         try {
@@ -65,10 +63,11 @@ export class SyncManager {
           let batchArray = [];
 
           for (const tile of generator) {
-            const path = `${this.tilesConfig.path}/${layerId}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
+            const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
+            const fullPath = path.join(this.tilesConfig.path, tileRelativePath);
 
-            if (await isFileExists(path)) {
-              batchArray.push(this.signAndUpload(tile, path));
+            if (await isFileExists(fullPath)) {
+              batchArray.push(this.signAndUpload(fullPath, tileRelativePath));
             }
 
             if (batchArray.length === this.tilesConfig.uploadBatchSize) {
@@ -95,11 +94,11 @@ export class SyncManager {
     }
   }
 
-  private async signAndUpload(tile: ITile, path: string): Promise<void> {
-    let fileBuffer = await fsp.readFile(path);
+  private async signAndUpload(fullPath: string, tileRelativePath: string): Promise<void> {
+    let fileBuffer = await fsp.readFile(fullPath);
     if (this.tilesConfig.sigIsNeeded) {
-      fileBuffer = await this.cryptoManager.generateSignedFile(path, fileBuffer);
+      fileBuffer = await this.cryptoManager.generateSignedFile(fullPath, fileBuffer);
     }
-    await this.tilesManager.uploadTile(tile, fileBuffer);
+    await this.tilesManager.uploadTile(tileRelativePath, fileBuffer);
   }
 }
