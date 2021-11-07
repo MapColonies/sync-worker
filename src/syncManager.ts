@@ -61,6 +61,7 @@ export class SyncManager {
           this.logger.info(`Running sync task for taskId: ${task.id}, on jobId=${task.jobId}`);
           const generator = tilesGenerator(batch);
           let batchArray = [];
+          let uploadedTiles = 0;
 
           for (const tile of generator) {
             const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
@@ -72,16 +73,16 @@ export class SyncManager {
 
             if (batchArray.length === this.tilesConfig.uploadBatchSize) {
               await Promise.all(batchArray);
-              await this.tilesManager.updateTilesCount(layerId, batchArray.length);
+              uploadedTiles += batchArray.length;
               batchArray = [];
             }
           }
           // resolved left overs
           await Promise.all(batchArray);
-
-          await this.tilesManager.updateTilesCount(layerId, batchArray.length);
+          uploadedTiles += batchArray.length;
 
           await this.queueClient.queueHandler.ack(jobId, taskId);
+          await this.tilesManager.updateTilesCount(layerId, uploadedTiles);
           await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         } catch (error) {
           await this.queueClient.queueHandler.reject(jobId, taskId, true, (error as Error).message);
