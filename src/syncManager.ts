@@ -81,8 +81,14 @@ export class SyncManager {
           await Promise.all(batchArray);
           uploadedTiles += batchArray.length;
 
-          await this.queueClient.queueHandler.ack(jobId, taskId);
           await this.tilesManager.updateTilesCount(layerId, uploadedTiles);
+          try {
+            await this.queueClient.queueHandler.ack(jobId, taskId);
+          } catch (error) {
+            // reduce the number of the tiles if ack fails
+            await this.tilesManager.updateTilesCount(layerId, -uploadedTiles);
+            throw error;
+          }
           await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         } catch (error) {
           await this.queueClient.queueHandler.reject(jobId, taskId, true, (error as Error).message);

@@ -96,22 +96,22 @@ describe('syncManager', () => {
         return Promise.resolve();
       });
 
-      ackStub.mockImplementation(async () => {
+      updateTilesCountStub.mockImplementation(async () => {
         if (uploadTilesStub.mock.calls.length !== 1) {
           throw new Error('invalid call order: uploadTiles should be called before updateTilesCount');
         }
         return Promise.resolve();
       });
 
-      updateTilesCountStub.mockImplementation(async () => {
-        if (ackStub.mock.calls.length !== 1) {
+      ackStub.mockImplementation(async () => {
+        if (updateTilesCountStub.mock.calls.length !== 1) {
           throw new Error('invalid call order: updateTilesCount should be called before ack');
         }
         return Promise.resolve();
       });
 
       notifyNifiOnCompleteStub.mockImplementation(async () => {
-        if (updateTilesCountStub.mock.calls.length !== 1) {
+        if (ackStub.mock.calls.length !== 1) {
           throw new Error('invalid call order: ack should be called before notifyNifiOnSuccess');
         }
         return Promise.resolve();
