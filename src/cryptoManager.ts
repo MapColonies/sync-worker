@@ -21,9 +21,12 @@ export class CryptoManager {
     this.key = this.readKeyFile(this.cryptoConfig.pem);
   }
 
-  public async generateSignedFile(fullPath: string, buffer: Buffer): Promise<Buffer> {
+  public async generateSignedFile(fullPath: string, buffer?: Buffer | string): Promise<Buffer> {
     try {
-      const fileHash = await this.computeHash(fullPath);
+      if (!buffer) {
+        buffer = await this.readFile(fullPath);
+      }
+      const fileHash = this.computeHash(buffer as Buffer);
       const encryptedHash = this.encryptHash(fileHash);
       this.logger.debug(`appending iv and signature into generated file from: ${fullPath}`);
       buffer = Buffer.concat([buffer, encryptedHash.iv]);
@@ -36,12 +39,16 @@ export class CryptoManager {
     }
   }
 
-  private async computeHash(filePath: string): Promise<Buffer> {
-    const secret = await fsp.readFile(filePath, { encoding: 'binary' });
+  private computeHash(buffer: Buffer): Buffer {
     const hash = crypto.createHash(this.cryptoConfig.shaSize);
-    hash.update(String(secret));
+    hash.update(String(buffer));
     const hashKey = hash.digest();
     return hashKey;
+  }
+
+  private async readFile(filePath: string): Promise<string | Buffer> {
+    const secret = await fsp.readFile(filePath, { encoding: 'binary' });
+    return secret;
   }
 
   private encryptHash(fileHash: Buffer): IEncryptedHash {
