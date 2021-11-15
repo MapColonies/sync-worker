@@ -47,7 +47,7 @@ env:
   gatewayUrl: "http://localhost:8084"
   gatewayRouteId: ""
   tiles:
-    path: /
+    path: /layerSources
     format: png
     uploadBatchSize: 100
     sigIsNeeded: false
