@@ -45,7 +45,8 @@ env:
   nifiBaseUrl: "http://localhost:8083"
   syncAttempts: 3
   gatewayUrl: "http://localhost:8084"
-  gatewayRouteId: ""
+  gatewayImageRouteId: ""
+  gatewayJsonRouteId: ""
   tiles:
     path: /
     format: png

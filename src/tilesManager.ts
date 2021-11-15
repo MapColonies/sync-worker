@@ -26,7 +26,7 @@ export class TilesManager {
 
   public async uploadTile(tileRelativePath: string, buffer: Buffer): Promise<void> {
     try {
-      await this.gatewayClient.uploadBin(buffer, tileRelativePath);
+      await this.gatewayClient.uploadImageToGW(buffer, tileRelativePath);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       this.logger.error(`upload failed for tile: ${tileRelativePath} with error: ${error}`);

@@ -11,6 +11,7 @@ import { TilesManager } from '../../src/tilesManager';
 import { NifiClient } from '../../src/clients/services/nifiClient';
 import { registerExternalValues } from '../ testContainerConfig';
 import * as utils from '../../src/common/utils';
+import { GatewayClient } from '../../src/clients/services/gatewayClient';
 
 let syncManager: SyncManager;
 let waitForTaskStub: jest.SpyInstance;
@@ -28,6 +29,7 @@ const cryptoManager = container.resolve(CryptoManager);
 const tilesManager = container.resolve(TilesManager);
 const queueClient = container.resolve(QueueClient);
 const nifiClient = container.resolve(NifiClient);
+const gatewayClient = container.resolve(GatewayClient);
 
 const tilesConfig = config.get<ITilesConfig>('tiles');
 const cryptoConfig = config.get<ICryptoConfig>('crypto');
@@ -45,7 +47,8 @@ describe('syncManager', () => {
       queueClient,
       tilesManager,
       cryptoManager,
-      nifiClient
+      nifiClient,
+      gatewayClient
     );
   });
 

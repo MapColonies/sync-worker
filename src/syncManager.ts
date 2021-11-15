@@ -11,6 +11,7 @@ import { CryptoManager } from './cryptoManager';
 import { TilesManager } from './tilesManager';
 import { isFileExists } from './common/utils';
 import { NifiClient } from './clients/services/nifiClient';
+import { GatewayClient } from './clients/services/gatewayClient';
 
 interface ITileRange {
   minX: number;
@@ -40,7 +41,8 @@ export class SyncManager {
     private readonly queueClient: QueueClient,
     private readonly tilesManager: TilesManager,
     private readonly cryptoManager: CryptoManager,
-    private readonly nifiClient: NifiClient
+    private readonly nifiClient: NifiClient,
+    private readonly gatewayClient: GatewayClient
   ) {
     this.syncAttempts = this.config.get<number>('syncAttempts');
   }
@@ -61,11 +63,10 @@ export class SyncManager {
         try {
           this.logger.info(`Running sync task for taskId: ${task.id}, on jobId=${task.jobId}, attempt: ${attempts}`);
           if (params.tocData) {
-            this.logger.info(`sign and upload toc data ${JSON.stringify(params.tocData)}`);
-            // todo:
-
-            const uint8array = new TextEncoder().encode(JSON.stringify(params.tocData));
-            this.signAndUploadJson(`${layerRelativePath}/toc.json`, uint8array.buffer);
+            const tocContentString = JSON.stringify(params.tocData);
+            this.logger.info(`sign and upload toc data ${tocContentString}`);
+            const tocContentBuffer = Buffer.from(tocContentString);
+            await this.signAndUploadJson(`${layerRelativePath}/toc.json`, tocContentBuffer);
           } else {
             this.logger.info(`sign and upload tiles`);
             const generator = tilesGenerator(batch);
@@ -119,9 +120,10 @@ export class SyncManager {
     await this.tilesManager.uploadTile(tileRelativePath, fileBuffer);
   }
 
-  private async signAndUploadJson(fileName: string, fileBuffer: Buffer): Promise<void> {
+  private async signAndUploadJson(fileName: string, buffer: Buffer): Promise<void> {
     if (this.tilesConfig.sigIsNeeded) {
-      fileBuffer = await this.cryptoManager.generateSignedFile(fileName, fileBuffer);
+      buffer = await this.cryptoManager.generateSignedFile(fileName, buffer);
     }
+    await this.gatewayClient.uploadJsonToGW(buffer, fileName);
   }
 }

@@ -39,7 +39,7 @@ describe('gatewayClient', () => {
       const buffer = getMockFileBuffer();
       // action
       const action = async () => {
-        await gatewayClient.uploadBin(buffer, filename);
+        await gatewayClient.uploadImageToGW(buffer, filename);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
