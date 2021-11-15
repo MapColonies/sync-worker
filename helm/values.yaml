@@ -55,7 +55,7 @@ env:
     readFileEncoding: ""
     pem: ""
     algoritm: ""
-    sigEncoding: ""
+    shaSize: ""
   queue:
     jobManagerBaseUrl: "http://localhost:8082"
     heartbeatManagerBaseUrl: "http://localhost:8085"
