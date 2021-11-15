@@ -1,4 +1,4 @@
-import { promises as fsp, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import crypto from 'crypto';
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
@@ -21,7 +21,7 @@ export class CryptoManager {
     this.key = this.readKeyFile(this.cryptoConfig.pem);
   }
 
-  public async generateSignedFile(fullPath: string, buffer: Buffer): Promise<Buffer> {
+  public generateSignedFile(fullPath: string, buffer: Buffer): Buffer {
     try {
       const fileHash = this.computeHash(buffer);
       const encryptedHash = this.encryptHash(fileHash);

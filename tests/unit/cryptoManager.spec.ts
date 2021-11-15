@@ -1,4 +1,3 @@
-import { promises as fsp } from 'fs';
 import crypto from 'crypto';
 import config from 'config';
 import jsLogger from '@map-colonies/js-logger';
@@ -8,7 +7,6 @@ import { ICryptoConfig } from '../../src/common/interfaces';
 
 // fsp module stubs
 let concatStub: jest.SpyInstance;
-let readFileStub: jest.SpyInstance;
 // crypto module stubs
 let createHashStub: jest.SpyInstance;
 let createCipherivStub: jest.SpyInstance;
@@ -16,7 +14,6 @@ let createCipherivStub: jest.SpyInstance;
 let cryptoManager: CryptoManager;
 
 const mockFileToSign = 'tests/mocks/files/mockTile.png';
-const mockKeyPem = '!%F=-?Pst970ss33445adfcF#-c3dafd';
 const cryptoConfig = config.get<ICryptoConfig>('crypto');
 
 const getMockFileBuffer = (): Buffer => {
@@ -47,9 +44,9 @@ describe('cryptoManager', () => {
   describe('#generateSingedFile', () => {
     it('should successfully generate singed files', async function () {
       // action
-      const action = async () => {
+      const action = () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
+        cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
@@ -81,9 +78,9 @@ describe('cryptoManager', () => {
         throw new Error();
       });
       // action
-      const action = async () => {
+      const action = () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
+        cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action).rejects.toThrow();
@@ -97,9 +94,9 @@ describe('cryptoManager', () => {
         throw new Error();
       });
       // action
-      const action = async () => {
+      const action = () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
+        cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
       await expect(action).rejects.toThrow();

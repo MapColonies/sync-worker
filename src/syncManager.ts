@@ -117,14 +117,14 @@ export class SyncManager {
   private async signAndUpload(fullPath: string, tileRelativePath: string): Promise<void> {
     let fileBuffer = await fsp.readFile(fullPath);
     if (this.tilesConfig.sigIsNeeded) {
-      fileBuffer = await this.cryptoManager.generateSignedFile(fullPath, fileBuffer);
+      fileBuffer = this.cryptoManager.generateSignedFile(fullPath, fileBuffer);
     }
     await this.tilesManager.uploadTile(tileRelativePath, fileBuffer);
   }
 
   private async signAndUploadJson(fileName: string, buffer: Buffer): Promise<void> {
     if (this.tilesConfig.sigIsNeeded) {
-      buffer = await this.cryptoManager.generateSignedFile(fileName, buffer);
+      buffer = this.cryptoManager.generateSignedFile(fileName, buffer);
     }
     await this.gatewayClient.uploadJsonToGW(buffer, fileName);
   }
