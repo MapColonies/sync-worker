@@ -3,7 +3,7 @@ import jsLogger from '@map-colonies/js-logger';
 import * as tilesGenerator from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import config from 'config';
 import { SyncManager } from '../../src/syncManager';
-import { task } from '../mocks/files/task';
+import { task, taskWithTocData } from '../mocks/files/task';
 import { QueueClient } from '../../src/clients/queueClient';
 import { CryptoManager } from '../../src/cryptoManager';
 import { ICryptoConfig, ITilesConfig } from '../../src/common/interfaces';
@@ -11,7 +11,7 @@ import { TilesManager } from '../../src/tilesManager';
 import { NifiClient } from '../../src/clients/services/nifiClient';
 import { registerExternalValues } from '../ testContainerConfig';
 import * as utils from '../../src/common/utils';
-import { GatewayClient } from '../../src/clients/services/gatewayClient';
+import { gatewayClientMock, uploadJsonToGWMock } from '../mocks/clients/gatewayClient';
 
 let syncManager: SyncManager;
 let waitForTaskStub: jest.SpyInstance;
@@ -29,7 +29,6 @@ const cryptoManager = container.resolve(CryptoManager);
 const tilesManager = container.resolve(TilesManager);
 const queueClient = container.resolve(QueueClient);
 const nifiClient = container.resolve(NifiClient);
-const gatewayClient = container.resolve(GatewayClient);
 
 const tilesConfig = config.get<ITilesConfig>('tiles');
 const cryptoConfig = config.get<ICryptoConfig>('crypto');
@@ -48,7 +47,7 @@ describe('syncManager', () => {
       tilesManager,
       cryptoManager,
       nifiClient,
-      gatewayClient
+      gatewayClientMock
     );
   });
 
@@ -134,6 +133,40 @@ describe('syncManager', () => {
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(1);
       expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
       expect(rejectStub).toHaveBeenCalledTimes(0);
+      expect(ackStub).toHaveBeenCalledWith(task.jobId, task.id);
+    });
+
+    it('should successfully sign and upload toc.json file', async function () {
+      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValueOnce(taskWithTocData);
+
+      generateSignedFileStub.mockImplementation(() => {
+        if (waitForTaskStub.mock.calls.length !== 1) {
+          throw new Error('invalid call order: waitForTask should be called before generateSignedFile');
+        }
+        return tilesArray;
+      });
+
+      notifyNifiOnCompleteStub.mockImplementation(async () => {
+        if (ackStub.mock.calls.length !== 1) {
+          throw new Error('invalid call order: ack should be called before notifyNifiOnSuccess');
+        }
+        return Promise.resolve();
+      });
+
+      // action
+      const action = async () => {
+        await syncManager.runSync();
+      };
+      // expectation;
+      await expect(action()).resolves.not.toThrow();
+      expect(uploadJsonToGWMock).toHaveBeenCalledTimes(1);
+      expect(waitForTaskStub).toHaveBeenCalledTimes(1);
+      expect(generateSignedFileStub).toHaveBeenCalledTimes(1);
+      expect(ackStub).toHaveBeenCalledTimes(1);
+      expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
+      expect(rejectStub).toHaveBeenCalledTimes(0);
+      expect(updateTilesCountStub).toHaveBeenCalledTimes(0);
+      expect(uploadTilesStub).toHaveBeenCalledTimes(0);
       expect(ackStub).toHaveBeenCalledWith(task.jobId, task.id);
     });
 

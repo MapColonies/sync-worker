@@ -26,7 +26,7 @@ interface IParameters {
   resourceId: string;
   resourceVersion: string;
   layerRelativePath: string;
-  tocData?: JSON;
+  tocData?: Record<string, unknown>;
 }
 
 @singleton()
@@ -67,6 +67,8 @@ export class SyncManager {
             this.logger.info(`sign and upload toc data ${tocContentString}`);
             const tocContentBuffer = Buffer.from(tocContentString);
             await this.signAndUploadJson(`${layerRelativePath}/toc.json`, tocContentBuffer);
+            await this.queueClient.queueHandler.ack(jobId, taskId);
+            await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
           } else {
             this.logger.info(`sign and upload tiles`);
             const generator = tilesGenerator(batch);

@@ -21,12 +21,9 @@ export class CryptoManager {
     this.key = this.readKeyFile(this.cryptoConfig.pem);
   }
 
-  public async generateSignedFile(fullPath: string, buffer: Buffer, bufferAsString?: string): Promise<Buffer> {
+  public async generateSignedFile(fullPath: string, buffer: Buffer): Promise<Buffer> {
     try {
-      if (bufferAsString === undefined) {
-        bufferAsString = await fsp.readFile(fullPath, { encoding: 'binary' });
-      }
-      const fileHash = this.computeHash(bufferAsString);
+      const fileHash = this.computeHash(buffer);
       const encryptedHash = this.encryptHash(fileHash);
       this.logger.debug(`appending iv and signature into generated file from: ${fullPath}`);
       buffer = Buffer.concat([buffer, encryptedHash.iv]);
@@ -39,9 +36,9 @@ export class CryptoManager {
     }
   }
 
-  private computeHash(bufferAsString: string): Buffer {
+  private computeHash(buffer: Buffer): Buffer {
     const hash = crypto.createHash(this.cryptoConfig.shaSize);
-    hash.update(bufferAsString);
+    hash.update(buffer);
     const hashKey = hash.digest();
     return hashKey;
   }

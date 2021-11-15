@@ -32,7 +32,6 @@ describe('cryptoManager', () => {
   beforeEach(function () {
     concatStub = jest.spyOn(Buffer, 'concat');
     concatStub.mockImplementation(async () => Promise.resolve());
-    readFileStub = jest.spyOn(fsp, 'readFile');
     // crpyto spys
     createHashStub = jest.spyOn(crypto, 'createHash');
     createCipherivStub = jest.spyOn(crypto, 'createCipheriv');
@@ -47,8 +46,6 @@ describe('cryptoManager', () => {
 
   describe('#generateSingedFile', () => {
     it('should successfully generate singed files', async function () {
-      // mock
-      readFileStub.mockResolvedValue(mockKeyPem);
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
@@ -56,7 +53,6 @@ describe('cryptoManager', () => {
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(1);
       expect(concatStub).toHaveBeenCalledTimes(2);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
@@ -75,7 +71,6 @@ describe('cryptoManager', () => {
       };
       // expectation;
       expect(action).toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(0);
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
@@ -85,7 +80,6 @@ describe('cryptoManager', () => {
       createHashStub.mockImplementation(() => {
         throw new Error();
       });
-      readFileStub.mockResolvedValue(mockKeyPem);
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
@@ -93,7 +87,6 @@ describe('cryptoManager', () => {
       };
       // expectation;
       await expect(action).rejects.toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(1);
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
@@ -103,7 +96,6 @@ describe('cryptoManager', () => {
       createCipherivStub.mockImplementation(() => {
         throw new Error();
       });
-      readFileStub.mockResolvedValue(mockKeyPem);
       // action
       const action = async () => {
         const fileBuffer = getMockFileBuffer();
@@ -111,7 +103,6 @@ describe('cryptoManager', () => {
       };
       // expectation;
       await expect(action).rejects.toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(1);
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });

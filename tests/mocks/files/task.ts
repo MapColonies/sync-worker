@@ -26,4 +26,8 @@ const task: ITaskResponse = {
   },
 };
 
-export { task };
+const taskWithTocData = { ...task };
+taskWithTocData.parameters = { ...(task.parameters as Record<string, unknown>) };
+(taskWithTocData.parameters as { tocData: Record<string, unknown> }).tocData = { todTestFata: 'data' };
+
+export { task, taskWithTocData };
