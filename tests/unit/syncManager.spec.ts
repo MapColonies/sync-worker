@@ -55,7 +55,7 @@ describe('syncManager', () => {
     waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
     generateSignedFileStub = jest
       .spyOn(cryptoManager, 'generateSignedFile')
-      .mockImplementation(async () => Buffer.from([await fsp.readFile('tests/mocks/tiles/testId/testVersion/testProductType/0/0/1.png')]));
+      .mockImplementation(() => Buffer.from([fsp.readFile('tests/mocks/tiles/testId/testVersion/testProductType/0/0/1.png')]));
     uploadTilesStub = jest.spyOn(tilesManager, 'uploadTile').mockImplementation(async () => Promise.resolve());
     updateTilesCountStub = jest.spyOn(tilesManager, 'updateTilesCount');
     ackStub = jest.spyOn(queueClient.queueHandler, 'ack').mockImplementation(async () => Promise.resolve());

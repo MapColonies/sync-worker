@@ -42,14 +42,14 @@ describe('cryptoManager', () => {
   });
 
   describe('#generateSingedFile', () => {
-    it('should successfully generate singed files', async function () {
+    it('should successfully generate singed files', function () {
       // action
       const action = () => {
         const fileBuffer = getMockFileBuffer();
         cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
-      await expect(action()).resolves.not.toThrow();
+      expect(action()).not.toThrow();
       expect(concatStub).toHaveBeenCalledTimes(2);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
@@ -72,7 +72,7 @@ describe('cryptoManager', () => {
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
-    it('should reject generate singed files with create hash error', async function () {
+    it('should reject generate singed files with create hash error', function () {
       // mock
       createHashStub.mockImplementation(() => {
         throw new Error();
@@ -83,12 +83,12 @@ describe('cryptoManager', () => {
         cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
-      await expect(action).rejects.toThrow();
+      expect(action).toThrow();
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
-    it('should reject generate singed files with create Cipher iv error', async function () {
+    it('should reject generate singed files with create Cipher iv error', function () {
       // mock
       createCipherivStub.mockImplementation(() => {
         throw new Error();
@@ -99,7 +99,7 @@ describe('cryptoManager', () => {
         cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
-      await expect(action).rejects.toThrow();
+      expect(action).toThrow();
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
