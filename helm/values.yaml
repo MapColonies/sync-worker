@@ -20,7 +20,7 @@ image:
 
 storage:
   internalPvc:
-    create: true
+    create: false
     name: "internal-pvc"
     mountPath: "/app/outputs"
   internalPv:
