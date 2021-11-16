@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/MapColonies/sync-worker/compare/v1.2.0...v1.3.0) (2021-11-16)
+
+
+### Features
+
+* support sending TOC to GW ([#6](https://github.com/MapColonies/sync-worker/issues/6)) ([80be62a](https://github.com/MapColonies/sync-worker/commit/80be62ac96d7f9f09aa07ec322de5cb986bfb19a))
+
+
+### Bug Fixes
+
+* fix NiFi route ([#5](https://github.com/MapColonies/sync-worker/issues/5)) ([58a6865](https://github.com/MapColonies/sync-worker/commit/58a68652127db2b813e7264f2406a7d9c9609f67))
+* prevent duplicate tiles on layer-spec when in retry ([#4](https://github.com/MapColonies/sync-worker/issues/4)) ([25992d5](https://github.com/MapColonies/sync-worker/commit/25992d50df5719f7fd2dea6a8c09bf832b7edb24))
+
 ## [1.2.0](https://github.com/MapColonies/sync-worker/compare/v1.1.0...v1.2.0) (2021-11-02)
 
 
