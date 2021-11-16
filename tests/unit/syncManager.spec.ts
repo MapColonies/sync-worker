@@ -164,14 +164,8 @@ describe('syncManager', () => {
         }
         return Promise.resolve();
       });
-      try {
-        await syncManager.runSync();
-      } catch (e) {
-        console.error(e);
-        console.error((e as Error).stack);
-      }
 
-      // await expect(syncManager.runSync()).resolves.not.toThrow();
+      await expect(syncManager.runSync()).resolves.not.toThrow();
       expect(uploadJsonToGWMock).toHaveBeenCalledTimes(1);
       expect(waitForTaskStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(1);
@@ -190,10 +184,6 @@ describe('syncManager', () => {
       waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
       isFileExistsStub.mockResolvedValueOnce(false);
       tilesGeneratorStub.mockReturnValue(tilesArray);
-      // // action
-      // const action = async () => {
-      //   await syncManager.runSync();
-      // };
       // expectation;
       await expect(syncManager.runSync()).resolves.not.toThrow();
       expect(waitForTaskStub).toHaveBeenCalledTimes(1);
