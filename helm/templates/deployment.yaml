@@ -30,7 +30,7 @@ spec:
         {{- include "sync-worker.selectorLabels" . | nindent 8 }}
     spec:
       volumes:
-      - name: internal-storage
+      - name: sources-storage
         persistentVolumeClaim:
           claimName: {{ .Values.storage.internalPvc.name }}
       containers:
