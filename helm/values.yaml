@@ -21,7 +21,7 @@ image:
 storage:
   internalPvc:
     create: false
-    name: "map-proxy-sources"
+    name: "internal-pvc"
     mountPath: "/layerSources"
   internalPv:
     name: "internal-pv"
