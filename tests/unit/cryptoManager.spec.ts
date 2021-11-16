@@ -1,4 +1,4 @@
-import { promises as fsp } from 'fs';
+import fs from 'fs';
 import crypto from 'crypto';
 import config from 'config';
 import jsLogger from '@map-colonies/js-logger';
@@ -8,34 +8,34 @@ import { ICryptoConfig } from '../../src/common/interfaces';
 
 // fsp module stubs
 let concatStub: jest.SpyInstance;
-let readFileStub: jest.SpyInstance;
 // crypto module stubs
 let createHashStub: jest.SpyInstance;
 let createCipherivStub: jest.SpyInstance;
 
 let cryptoManager: CryptoManager;
+let fsReadFileSync: jest.SpyInstance;
 
 const mockFileToSign = 'tests/mocks/files/mockTile.png';
 const mockKeyPem = '!%F=-?Pst970ss33445adfcF#-c3dafd';
 const cryptoConfig = config.get<ICryptoConfig>('crypto');
 
 const getMockFileBuffer = (): Buffer => {
-  const fileBuffer = Buffer.from(['mockData']);
+  const fileBuffer = Buffer.from('mockData');
   return fileBuffer;
 };
 
 describe('cryptoManager', () => {
-  beforeAll(function () {
-    cryptoManager = new CryptoManager(jsLogger({ enabled: false }), cryptoConfig);
-  });
-
   beforeEach(function () {
     concatStub = jest.spyOn(Buffer, 'concat');
     concatStub.mockImplementation(async () => Promise.resolve());
-    readFileStub = jest.spyOn(fsp, 'readFile');
     // crpyto spys
     createHashStub = jest.spyOn(crypto, 'createHash');
     createCipherivStub = jest.spyOn(crypto, 'createCipheriv');
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    fsReadFileSync = jest.spyOn(fs, 'readFileSync');
+    fsReadFileSync.mockReturnValue(mockKeyPem);
+    cryptoManager = new CryptoManager(jsLogger({ enabled: false }), cryptoConfig);
   });
 
   afterEach(() => {
@@ -46,22 +46,23 @@ describe('cryptoManager', () => {
   });
 
   describe('#generateSingedFile', () => {
-    it('should successfully generate singed files', async function () {
-      // mock
-      readFileStub.mockResolvedValue(mockKeyPem);
+    it('should successfully generate singed files', function () {
       // action
-      const action = async () => {
+      const action = () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
+        cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
-      await expect(action()).resolves.not.toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(1);
+      expect(action).not.toThrow();
       expect(concatStub).toHaveBeenCalledTimes(2);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
 
     it('should reject generate singed files due key file is not exists', function () {
+      fsReadFileSync = jest.spyOn(fs, 'readFileSync');
+      fsReadFileSync.mockImplementation(() => {
+        throw new Error('failed for test');
+      });
       // mock
       const mockCryptoConfig: ICryptoConfig = {
         pem: 'invalid/path/to/private_key.pem',
@@ -75,43 +76,38 @@ describe('cryptoManager', () => {
       };
       // expectation;
       expect(action).toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(0);
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
-    it('should reject generate singed files with create hash error', async function () {
+    it('should reject generate singed files with create hash error', function () {
       // mock
       createHashStub.mockImplementation(() => {
         throw new Error();
       });
-      readFileStub.mockResolvedValue(mockKeyPem);
       // action
-      const action = async () => {
+      const action = () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
+        cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
-      await expect(action).rejects.toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(1);
+      expect(action).toThrow();
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(0);
     });
 
-    it('should reject generate singed files with create Cipher iv error', async function () {
+    it('should reject generate singed files with create Cipher iv error', function () {
       // mock
       createCipherivStub.mockImplementation(() => {
         throw new Error();
       });
-      readFileStub.mockResolvedValue(mockKeyPem);
       // action
-      const action = async () => {
+      const action = () => {
         const fileBuffer = getMockFileBuffer();
-        await cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
+        cryptoManager.generateSignedFile(mockFileToSign, fileBuffer);
       };
       // expectation;
-      await expect(action).rejects.toThrow();
-      expect(readFileStub).toHaveBeenCalledTimes(1);
+      expect(action).toThrow();
       expect(concatStub).toHaveBeenCalledTimes(0);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });

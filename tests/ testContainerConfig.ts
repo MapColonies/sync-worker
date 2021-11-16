@@ -2,7 +2,6 @@ import config from 'config';
 import { trace } from '@opentelemetry/api';
 import { DependencyContainer } from 'tsyringe/dist/typings/types';
 import jsLogger from '@map-colonies/js-logger';
-import { Metrics } from '@map-colonies/telemetry';
 import { Services } from '../src/common/constants';
 import { tracing } from '../src/common/tracing';
 import { InjectionObject, registerDependencies } from '../src/common/dependencyRegistration';
@@ -19,8 +18,6 @@ export const registerExternalValues = (options?: RegisterOptions): DependencyCon
   const tilesConfig = config.get<ITilesConfig>('tiles');
   const gatewayConfig = config.get<IGatewayConfig>('gateway');
   const cryptoConfig = config.get<ICryptoConfig>('crypto');
-  const metrics = new Metrics('app');
-  const meter = metrics.start();
 
   tracing.start();
   const tracer = trace.getTracer('app');
@@ -33,13 +30,13 @@ export const registerExternalValues = (options?: RegisterOptions): DependencyCon
     { token: Services.GATEWAY_CONFIG, provider: { useValue: gatewayConfig } },
     { token: Services.CRYPTO_CONFIG, provider: { useValue: cryptoConfig } },
     { token: Services.TRACER, provider: { useValue: tracer } },
-    { token: Services.METER, provider: { useValue: meter } },
+    { token: Services.METER, provider: { useValue: jest.fn() } },
     {
       token: 'onSignal',
       provider: {
         useValue: {
           useValue: async (): Promise<void> => {
-            await Promise.all([tracing.stop(), metrics.stop()]);
+            await Promise.all([tracing.stop()]);
           },
         },
       },

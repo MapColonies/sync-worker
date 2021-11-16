@@ -11,6 +11,7 @@ import { CryptoManager } from './cryptoManager';
 import { TilesManager } from './tilesManager';
 import { isFileExists } from './common/utils';
 import { NifiClient } from './clients/services/nifiClient';
+import { GatewayClient } from './clients/services/gatewayClient';
 
 interface ITileRange {
   minX: number;
@@ -25,6 +26,7 @@ interface IParameters {
   resourceId: string;
   resourceVersion: string;
   layerRelativePath: string;
+  tocData?: Record<string, unknown>;
 }
 
 @singleton()
@@ -39,7 +41,8 @@ export class SyncManager {
     private readonly queueClient: QueueClient,
     private readonly tilesManager: TilesManager,
     private readonly cryptoManager: CryptoManager,
-    private readonly nifiClient: NifiClient
+    private readonly nifiClient: NifiClient,
+    private readonly gatewayClient: GatewayClient
   ) {
     this.syncAttempts = this.config.get<number>('syncAttempts');
   }
@@ -58,38 +61,48 @@ export class SyncManager {
 
       if (attempts <= this.syncAttempts) {
         try {
-          this.logger.info(`Running sync task for taskId: ${task.id}, on jobId=${task.jobId}`);
-          const generator = tilesGenerator(batch);
-          let batchArray = [];
-          let uploadedTiles = 0;
-
-          for (const tile of generator) {
-            const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
-            const fullPath = path.join(this.tilesConfig.path, tileRelativePath);
-
-            if (await isFileExists(fullPath)) {
-              batchArray.push(this.signAndUpload(fullPath, tileRelativePath));
-            }
-
-            if (batchArray.length === this.tilesConfig.uploadBatchSize) {
-              await Promise.all(batchArray);
-              uploadedTiles += batchArray.length;
-              batchArray = [];
-            }
-          }
-          // resolved left overs
-          await Promise.all(batchArray);
-          uploadedTiles += batchArray.length;
-
-          await this.tilesManager.updateTilesCount(layerId, uploadedTiles);
-          try {
+          this.logger.info(`Running sync task for taskId: ${task.id}, on jobId=${task.jobId}, attempt: ${attempts}`);
+          if (params.tocData) {
+            const tocContentString = JSON.stringify(params.tocData);
+            this.logger.info(`sign and upload toc data ${tocContentString}`);
+            const tocContentBuffer = Buffer.from(tocContentString);
+            await this.signAndUploadJson(`${layerRelativePath}/toc.json`, tocContentBuffer);
             await this.queueClient.queueHandler.ack(jobId, taskId);
-          } catch (error) {
-            // reduce the number of the tiles if ack fails
-            await this.tilesManager.updateTilesCount(layerId, -uploadedTiles);
-            throw error;
+            await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
+          } else {
+            this.logger.info(`sign and upload tiles`);
+            const generator = tilesGenerator(batch);
+            let batchArray = [];
+            let uploadedTiles = 0;
+
+            for (const tile of generator) {
+              const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
+              const fullPath = path.join(this.tilesConfig.path, tileRelativePath);
+
+              if (await isFileExists(fullPath)) {
+                batchArray.push(this.signAndUpload(fullPath, tileRelativePath));
+              }
+
+              if (batchArray.length === this.tilesConfig.uploadBatchSize) {
+                await Promise.all(batchArray);
+                uploadedTiles += batchArray.length;
+                batchArray = [];
+              }
+            }
+            // resolved left overs
+            await Promise.all(batchArray);
+            uploadedTiles += batchArray.length;
+
+            await this.tilesManager.updateTilesCount(layerId, uploadedTiles);
+            try {
+              await this.queueClient.queueHandler.ack(jobId, taskId);
+            } catch (error) {
+              // reduce the number of the tiles if ack fails
+              await this.tilesManager.updateTilesCount(layerId, -uploadedTiles);
+              throw error;
+            }
+            await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
           }
-          await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         } catch (error) {
           await this.queueClient.queueHandler.reject(jobId, taskId, true, (error as Error).message);
           await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
@@ -104,8 +117,15 @@ export class SyncManager {
   private async signAndUpload(fullPath: string, tileRelativePath: string): Promise<void> {
     let fileBuffer = await fsp.readFile(fullPath);
     if (this.tilesConfig.sigIsNeeded) {
-      fileBuffer = await this.cryptoManager.generateSignedFile(fullPath, fileBuffer);
+      fileBuffer = this.cryptoManager.generateSignedFile(fullPath, fileBuffer);
     }
     await this.tilesManager.uploadTile(tileRelativePath, fileBuffer);
+  }
+
+  private async signAndUploadJson(fileName: string, buffer: Buffer): Promise<void> {
+    if (this.tilesConfig.sigIsNeeded) {
+      buffer = this.cryptoManager.generateSignedFile(fileName, buffer);
+    }
+    await this.gatewayClient.uploadJsonToGW(buffer, fileName);
   }
 }

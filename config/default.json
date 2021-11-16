@@ -30,7 +30,8 @@
   "syncAttempts": 5,
   "gateway": {
     "url": "http://localhost:8084",
-    "routeId": ""
+    "imageRouteId": "",
+    "jsonRouteId": ""
   },
   "tiles": {
     "path": "/path/to/tiles/directory",

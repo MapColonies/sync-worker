@@ -15,7 +15,7 @@ let gatewayClient: GatewayClient;
 const container = registerExternalValues();
 
 const getMockFileBuffer = (): Buffer => {
-  const fileBuffer = Buffer.from(['mockData']);
+  const fileBuffer = Buffer.from('mockData');
   return fileBuffer;
 };
 
@@ -39,7 +39,7 @@ describe('gatewayClient', () => {
       const buffer = getMockFileBuffer();
       // action
       const action = async () => {
-        await gatewayClient.uploadBin(buffer, filename);
+        await gatewayClient.uploadImageToGW(buffer, filename);
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();

@@ -47,7 +47,8 @@
   },
   "gateway": {
     "url": "GATEWAY_URL",
-    "routeId": "GATEWAY_ROUTE_ID"
+    "imageRouteId": "GATEWAY_IMAGE_ROUTE_ID",
+    "jsonRouteId": "GATEWAY_JSON_ROUTE_ID"
   },
   "tiles": {
     "path": "TILES_PATH",

@@ -6,12 +6,24 @@ import { Services } from '../../common/constants';
 
 @singleton()
 export class GatewayClient extends HttpClient {
+  public gatewayImageRouteId: string;
+  public gatewayJsonRouteId: string;
+
   public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.CONFIG) private readonly config: IConfig) {
     super(logger, config.get<string>('gateway.url'), 'GatewayClient', config.get<IHttpRetryConfig>('httpRetry'));
+    this.gatewayImageRouteId = this.config.get<string>('gateway.imageRouteId');
+    this.gatewayJsonRouteId = this.config.get<string>('gateway.jsonRouteId');
   }
 
-  public async uploadBin(buffer: Buffer, filename: string): Promise<void> {
-    const routeId = this.config.get<string>('gateway.routeId');
+  public async uploadImageToGW(buffer: Buffer, filename: string): Promise<void> {
+    return this.internalUploadFile(this.gatewayImageRouteId, buffer, filename);
+  }
+
+  public async uploadJsonToGW(buffer: Buffer, filename: string): Promise<void> {
+    return this.internalUploadFile(this.gatewayJsonRouteId, buffer, filename);
+  }
+
+  private async internalUploadFile(routeId: string, buffer: Buffer, filename: string): Promise<void> {
     this.axiosOptions.headers = {
       'content-type': 'application/octet-stream',
     };

@@ -1,4 +1,4 @@
-import { promises as fsp, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import crypto from 'crypto';
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
@@ -21,9 +21,9 @@ export class CryptoManager {
     this.key = this.readKeyFile(this.cryptoConfig.pem);
   }
 
-  public async generateSignedFile(fullPath: string, buffer: Buffer): Promise<Buffer> {
+  public generateSignedFile(fullPath: string, buffer: Buffer): Buffer {
     try {
-      const fileHash = await this.computeHash(fullPath);
+      const fileHash = this.computeHash(buffer);
       const encryptedHash = this.encryptHash(fileHash);
       this.logger.debug(`appending iv and signature into generated file from: ${fullPath}`);
       buffer = Buffer.concat([buffer, encryptedHash.iv]);
@@ -36,10 +36,9 @@ export class CryptoManager {
     }
   }
 
-  private async computeHash(filePath: string): Promise<Buffer> {
-    const secret = await fsp.readFile(filePath, { encoding: 'binary' });
+  private computeHash(buffer: Buffer): Buffer {
     const hash = crypto.createHash(this.cryptoConfig.shaSize);
-    hash.update(String(secret));
+    hash.update(buffer);
     const hashKey = hash.digest();
     return hashKey;
   }
