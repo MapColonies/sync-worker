@@ -1,9 +1,10 @@
-import { promises as fsp } from 'fs';
+import fs from 'fs';
 import jsLogger from '@map-colonies/js-logger';
 import * as tilesGenerator from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import config from 'config';
+import { DependencyContainer } from 'tsyringe';
 import { SyncManager } from '../../src/syncManager';
-import { task, taskWithTocData } from '../mocks/files/task';
+import { getTask } from '../mocks/files/task';
 import { QueueClient } from '../../src/clients/queueClient';
 import { CryptoManager } from '../../src/cryptoManager';
 import { ICryptoConfig, ITilesConfig } from '../../src/common/interfaces';
@@ -23,12 +24,9 @@ let rejectStub: jest.SpyInstance;
 let tilesGeneratorStub: jest.SpyInstance;
 let notifyNifiOnCompleteStub: jest.SpyInstance;
 let isFileExistsStub: jest.SpyInstance;
+let fsReadFileSync: jest.SpyInstance;
 
-const container = registerExternalValues();
-const cryptoManager = container.resolve(CryptoManager);
-const tilesManager = container.resolve(TilesManager);
-const queueClient = container.resolve(QueueClient);
-const nifiClient = container.resolve(NifiClient);
+let container: DependencyContainer;
 
 const tilesConfig = config.get<ITilesConfig>('tiles');
 const cryptoConfig = config.get<ICryptoConfig>('crypto');
@@ -38,6 +36,30 @@ const tilesArray = [{ zoom: 0, x: 0, y: 1 }];
 describe('syncManager', () => {
   beforeAll(function () {
     jest.useFakeTimers();
+  });
+
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    fsReadFileSync = jest.spyOn(fs, 'readFileSync');
+    fsReadFileSync.mockReturnValue('mockFileBuffer');
+
+    container = registerExternalValues({ useChild: true });
+    const cryptoManager = container.resolve(CryptoManager);
+    const tilesManager = container.resolve(TilesManager);
+    const queueClient = container.resolve(QueueClient);
+    const nifiClient = container.resolve(NifiClient);
+
+    generateSignedFileStub = jest
+      .spyOn(cryptoManager, 'generateSignedFile')
+      .mockImplementation(() => Buffer.from('mock_png_data/testId/testVersion/testProductType/0/0/1.png'));
+    uploadTilesStub = jest.spyOn(tilesManager, 'uploadTile').mockImplementation(async () => Promise.resolve());
+    updateTilesCountStub = jest.spyOn(tilesManager, 'updateTilesCount');
+    ackStub = jest.spyOn(queueClient.queueHandler, 'ack').mockImplementation(async () => Promise.resolve());
+    rejectStub = jest.spyOn(queueClient.queueHandler, 'reject').mockImplementation(async () => Promise.resolve());
+    tilesGeneratorStub = jest.spyOn(tilesGenerator, 'tilesGenerator');
+    notifyNifiOnCompleteStub = jest.spyOn(nifiClient, 'notifyNifiOnComplete').mockImplementation(async () => Promise.resolve());
+    isFileExistsStub = jest.spyOn(utils, 'isFileExists');
+
     syncManager = new SyncManager(
       jsLogger({ enabled: false }),
       config,
@@ -51,20 +73,6 @@ describe('syncManager', () => {
     );
   });
 
-  beforeEach(() => {
-    waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
-    generateSignedFileStub = jest
-      .spyOn(cryptoManager, 'generateSignedFile')
-      .mockImplementation(() => Buffer.from([fsp.readFile('tests/mocks/tiles/testId/testVersion/testProductType/0/0/1.png')]));
-    uploadTilesStub = jest.spyOn(tilesManager, 'uploadTile').mockImplementation(async () => Promise.resolve());
-    updateTilesCountStub = jest.spyOn(tilesManager, 'updateTilesCount');
-    ackStub = jest.spyOn(queueClient.queueHandler, 'ack').mockImplementation(async () => Promise.resolve());
-    rejectStub = jest.spyOn(queueClient.queueHandler, 'reject').mockImplementation(async () => Promise.resolve());
-    tilesGeneratorStub = jest.spyOn(tilesGenerator, 'tilesGenerator');
-    notifyNifiOnCompleteStub = jest.spyOn(nifiClient, 'notifyNifiOnComplete').mockImplementation(async () => Promise.resolve());
-    isFileExistsStub = jest.spyOn(utils, 'isFileExists');
-  });
-
   afterEach(() => {
     container.reset();
     container.clearInstances();
@@ -76,6 +84,11 @@ describe('syncManager', () => {
     it('should successfully sign and upload file', async function () {
       // mock
       isFileExistsStub.mockResolvedValueOnce(true);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const queueClient = container.resolve(QueueClient);
+      const task = getTask();
+      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
 
       tilesGeneratorStub.mockImplementation(() => {
         if (waitForTaskStub.mock.calls.length !== 1) {
@@ -119,12 +132,8 @@ describe('syncManager', () => {
         return Promise.resolve();
       });
 
-      // action
-      const action = async () => {
-        await syncManager.runSync();
-      };
       // expectation;
-      await expect(action()).resolves.not.toThrow();
+      await expect(syncManager.runSync()).resolves.not.toThrow();
       expect(waitForTaskStub).toHaveBeenCalledTimes(1);
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(1);
@@ -137,7 +146,10 @@ describe('syncManager', () => {
     });
 
     it('should successfully sign and upload toc.json file', async function () {
-      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValueOnce(taskWithTocData);
+      const queueClient = container.resolve(QueueClient);
+      const taskWithTocData = getTask();
+      (taskWithTocData.parameters as { tocData: Record<string, unknown> }).tocData = { todTestFata: 'data' };
+      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(taskWithTocData);
 
       generateSignedFileStub.mockImplementation(() => {
         if (waitForTaskStub.mock.calls.length !== 1) {
@@ -152,13 +164,14 @@ describe('syncManager', () => {
         }
         return Promise.resolve();
       });
-
-      // action
-      const action = async () => {
+      try {
         await syncManager.runSync();
-      };
-      // expectation;
-      await expect(action()).resolves.not.toThrow();
+      } catch (e) {
+        console.error(e);
+        console.error((e as Error).stack);
+      }
+
+      // await expect(syncManager.runSync()).resolves.not.toThrow();
       expect(uploadJsonToGWMock).toHaveBeenCalledTimes(1);
       expect(waitForTaskStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(1);
@@ -167,19 +180,22 @@ describe('syncManager', () => {
       expect(rejectStub).toHaveBeenCalledTimes(0);
       expect(updateTilesCountStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(ackStub).toHaveBeenCalledWith(task.jobId, task.id);
+      expect(ackStub).toHaveBeenCalledWith(taskWithTocData.jobId, taskWithTocData.id);
     });
 
     it('should not sign and upload file if its not exists', async function () {
       // mock
+      const queueClient = container.resolve(QueueClient);
+      const task = getTask();
+      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
       isFileExistsStub.mockResolvedValueOnce(false);
       tilesGeneratorStub.mockReturnValue(tilesArray);
-      // action
-      const action = async () => {
-        await syncManager.runSync();
-      };
+      // // action
+      // const action = async () => {
+      //   await syncManager.runSync();
+      // };
       // expectation;
-      await expect(action()).resolves.not.toThrow();
+      await expect(syncManager.runSync()).resolves.not.toThrow();
       expect(waitForTaskStub).toHaveBeenCalledTimes(1);
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(0);
@@ -193,8 +209,11 @@ describe('syncManager', () => {
 
     it('should reject task due max attempts', async function () {
       // mock
-      isFileExistsStub.mockResolvedValueOnce(true);
+      const queueClient = container.resolve(QueueClient);
+      const task = getTask();
       task.attempts = 6;
+      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
+      isFileExistsStub.mockResolvedValueOnce(true);
       isFileExistsStub.mockResolvedValue(true);
 
       // action

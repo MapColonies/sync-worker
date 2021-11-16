@@ -15,7 +15,7 @@ let gatewayClient: GatewayClient;
 const container = registerExternalValues();
 
 const getMockFileBuffer = (): Buffer => {
-  const fileBuffer = Buffer.from(['mockData']);
+  const fileBuffer = Buffer.from('mockData');
   return fileBuffer;
 };
 

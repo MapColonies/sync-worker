@@ -1,5 +1,5 @@
 import { ITileRange } from '@map-colonies/mc-utils';
-import { task } from '../mocks/files/task';
+import { getTask } from '../mocks/files/task';
 import { registerExternalValues } from '../ testContainerConfig';
 import { axiosMocks, initAxiosMock } from '../mocks/axiosMock';
 import { NifiClient } from '../../src/clients/services/nifiClient';
@@ -37,14 +37,12 @@ describe('nifiClient', () => {
   describe('#notifyNifiOnSuccess', () => {
     it('should successfully notify Nifi after job success', async function () {
       axiosMocks.post.mockResolvedValue(axiosTestResponse);
+      const task = getTask();
       const params = task.parameters as IParameters;
       const layerId = `${params.resourceId}-${params.resourceVersion}`;
-      // action
-      const action = async () => {
-        await nifiClient.notifyNifiOnComplete(task.jobId, layerId);
-      };
+
       // expectation;
-      await expect(action()).resolves.not.toThrow();
+      await expect(nifiClient.notifyNifiOnComplete(task.jobId, layerId)).resolves.not.toThrow();
       expect(axiosMocks.post).toHaveBeenCalledTimes(1);
     });
   });

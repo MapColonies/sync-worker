@@ -11,7 +11,7 @@
   },
   "crypto": {
     "readFileEncoding": "ascii",
-    "pem": "tests/mocks/files/validKey.pem",
+    "pem": "tests/mocks/files/mehartet.pem",
     "shaSize": "sha512",
     "algoritm": "aes-256-cfb"
   }
