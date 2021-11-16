@@ -58,7 +58,7 @@ spec:
               path: /liveness
               port: http
           volumeMounts: 
-            - name: internal-storage
+            - name: sources-storage
               mountPath: {{ .Values.storage.internalPvc.mountPath }}
               subPath: tiles
           {{- if .Values.resources.enabled }}
