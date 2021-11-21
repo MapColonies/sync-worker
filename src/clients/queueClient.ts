@@ -6,16 +6,27 @@ import { Services } from '../common/constants';
 
 @singleton()
 export class QueueClient {
-  public readonly queueHandler: QueueHandler;
+  public readonly queueHandlerForTileTasks: QueueHandler;
+  public readonly queueHandlerForTocTasks: QueueHandler;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.QUEUE_CONFIG) private readonly queueConfig: IQueueConfig
   ) {
-    this.queueHandler = new QueueHandler(
+    this.queueHandlerForTileTasks = new QueueHandler(
       logger,
       this.queueConfig.jobType,
-      this.queueConfig.taskType,
+      this.queueConfig.tilesTaskType,
+      this.queueConfig.jobManagerBaseUrl,
+      this.queueConfig.heartbeatManagerBaseUrl,
+      this.queueConfig.dequeueIntervalMs,
+      this.queueConfig.heartbeatIntervalMs
+    );
+
+    this.queueHandlerForTocTasks = new QueueHandler(
+      logger,
+      this.queueConfig.jobType,
+      this.queueConfig.tocTaskType,
       this.queueConfig.jobManagerBaseUrl,
       this.queueConfig.heartbeatManagerBaseUrl,
       this.queueConfig.dequeueIntervalMs,

@@ -7,7 +7,7 @@
   },
   "telemetry": {
     "logger": {
-      "level": "info",
+      "level": "debug",
       "prettyPrint": false
     }
   },
@@ -51,7 +51,8 @@
     "dequeueIntervalMs": 5000,
     "heartbeatIntervalMs": 5000,
     "jobType": "Sync",
-    "taskType": "Sync"
+    "tilesTaskType": "tilesSync",
+    "tocTaskType": "tocSync"
   },
   "httpRetry": {
     "attempts": 5,
