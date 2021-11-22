@@ -63,7 +63,8 @@ env:
     dequeueIntervalMs: 3
     heartbeatIntervalMs: 0.5
     jobType: "Sync"
-    taskType: "Sync"
+    tilesTaskType: "tilesSync"
+    tocTaskType: "tocSync"
 resources:
   enabled: false
   value:
