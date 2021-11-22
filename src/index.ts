@@ -31,10 +31,10 @@ server.listen(port, () => {
 
 const mainLoop = async (): Promise<void> => {
   const isRunning = true;
+  logger.info(`tiles signature is set to: ${tilesConfig.sigIsNeeded.toString()}`);
   //eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (isRunning) {
     try {
-      logger.debug(`tiles signature is set to: ${tilesConfig.sigIsNeeded.toString()}`);
       await syncManager.runSync();
     } catch (error) {
       logger.error(`mainLoop: Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
