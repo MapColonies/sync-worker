@@ -16,7 +16,8 @@ export interface IQueueConfig {
   dequeueIntervalMs: number;
   heartbeatIntervalMs: number;
   jobType: string;
-  taskType: string;
+  tilesTaskType: string;
+  tocTaskType: string;
 }
 
 export interface ITilesConfig {

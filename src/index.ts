@@ -5,7 +5,7 @@ import { createServer } from 'http';
 import { createTerminus } from '@godaddy/terminus';
 import { Logger } from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
-import { get } from 'config';
+import config from 'config';
 import { DEFAULT_SERVER_PORT, Services } from './common/constants';
 import { getApp } from './app';
 import { SyncManager } from './syncManager';
@@ -15,7 +15,7 @@ interface IServerConfig {
   port: string;
 }
 
-const serverConfig = get<IServerConfig>('server');
+const serverConfig = config.get<IServerConfig>('server');
 const port: number = parseInt(serverConfig.port) || DEFAULT_SERVER_PORT;
 
 const app = getApp();
@@ -31,11 +31,13 @@ server.listen(port, () => {
 
 const mainLoop = async (): Promise<void> => {
   const isRunning = true;
+  logger.info(`tiles signature is set to: ${tilesConfig.sigIsNeeded.toString()}`);
+  const dequeueIntervalMs = config.get<number>('queue.dequeueIntervalMs');
   //eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (isRunning) {
     try {
-      logger.debug(`tiles signature is set to: ${tilesConfig.sigIsNeeded.toString()}`);
       await syncManager.runSync();
+      await new Promise((resolve) => setTimeout(resolve, dequeueIntervalMs));
     } catch (error) {
       logger.error(`mainLoop: Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }

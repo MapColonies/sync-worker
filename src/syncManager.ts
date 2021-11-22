@@ -48,67 +48,92 @@ export class SyncManager {
   }
 
   public async runSync(): Promise<void> {
-    const task = await this.queueClient.queueHandler.waitForTask();
+    await this.handleTocTask();
+    await this.handleTilesTask();
+  }
 
-    if (task) {
-      const params = task.parameters as IParameters;
-      const jobId = task.jobId;
-      const taskId = task.id;
+  public async handleTilesTask(): Promise<void> {
+    const tilesTask = await this.queueClient.queueHandlerForTileTasks.dequeue();
+    if (tilesTask) {
+      const params = tilesTask.parameters as IParameters;
+      const jobId = tilesTask.jobId;
+      const taskId = tilesTask.id;
       const batch = params.batch;
-      const attempts = task.attempts;
+      const attempts = tilesTask.attempts;
       const layerId = `${params.resourceId}-${params.resourceVersion}`;
       const layerRelativePath = params.layerRelativePath;
 
       if (attempts <= this.syncAttempts) {
         try {
-          this.logger.info(`Running sync task for taskId: ${task.id}, on jobId=${task.jobId}, attempt: ${attempts}`);
-          if (params.tocData) {
-            const tocContentString = JSON.stringify(params.tocData);
-            this.logger.info(`sign and upload toc data ${tocContentString}`);
-            const tocContentBuffer = Buffer.from(tocContentString);
-            await this.signAndUploadJson(`${layerRelativePath}/toc.json`, tocContentBuffer);
-            await this.queueClient.queueHandler.ack(jobId, taskId);
-            await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
-          } else {
-            this.logger.info(`sign and upload tiles`);
-            const generator = tilesGenerator(batch);
-            let batchArray = [];
-            let uploadedTiles = 0;
+          this.logger.info(`Running sync tiles task for taskId: ${tilesTask.id}, on jobId=${tilesTask.jobId}, attempt: ${attempts}`);
+          this.logger.info(`sign and upload tiles`);
+          const generator = tilesGenerator(batch);
+          let batchArray = [];
+          let uploadedTiles = 0;
 
-            for (const tile of generator) {
-              const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
-              const fullPath = path.join(this.tilesConfig.path, tileRelativePath);
+          for (const tile of generator) {
+            const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
+            const fullPath = path.join(this.tilesConfig.path, tileRelativePath);
 
-              if (await isFileExists(fullPath)) {
-                batchArray.push(this.signAndUpload(fullPath, tileRelativePath));
-              }
-
-              if (batchArray.length === this.tilesConfig.uploadBatchSize) {
-                await Promise.all(batchArray);
-                uploadedTiles += batchArray.length;
-                batchArray = [];
-              }
+            if (await isFileExists(fullPath)) {
+              batchArray.push(this.signAndUpload(fullPath, tileRelativePath));
             }
-            // resolved left overs
-            await Promise.all(batchArray);
-            uploadedTiles += batchArray.length;
 
-            await this.tilesManager.updateTilesCount(layerId, uploadedTiles);
-            try {
-              await this.queueClient.queueHandler.ack(jobId, taskId);
-            } catch (error) {
-              // reduce the number of the tiles if ack fails
-              await this.tilesManager.updateTilesCount(layerId, -uploadedTiles);
-              throw error;
+            if (batchArray.length === this.tilesConfig.uploadBatchSize) {
+              await Promise.all(batchArray);
+              uploadedTiles += batchArray.length;
+              batchArray = [];
             }
-            await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
           }
+          // resolved left overs
+          await Promise.all(batchArray);
+          uploadedTiles += batchArray.length;
+
+          await this.tilesManager.updateTilesCount(layerId, uploadedTiles);
+          try {
+            await this.queueClient.queueHandlerForTileTasks.ack(jobId, taskId);
+          } catch (error) {
+            // reduce the number of the tiles if ack fails
+            await this.tilesManager.updateTilesCount(layerId, -uploadedTiles);
+            throw error;
+          }
+          await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         } catch (error) {
-          await this.queueClient.queueHandler.reject(jobId, taskId, true, (error as Error).message);
+          await this.queueClient.queueHandlerForTileTasks.reject(jobId, taskId, true, (error as Error).message);
           await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         }
       } else {
-        await this.queueClient.queueHandler.reject(jobId, taskId, false);
+        await this.queueClient.queueHandlerForTileTasks.reject(jobId, taskId, false);
+        await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
+      }
+    }
+  }
+
+  public async handleTocTask(): Promise<void> {
+    const tocTask = await this.queueClient.queueHandlerForTocTasks.dequeue();
+    if (tocTask) {
+      const params = tocTask.parameters as IParameters;
+      const jobId = tocTask.jobId;
+      const taskId = tocTask.id;
+      const attempts = tocTask.attempts;
+      const layerId = `${params.resourceId}-${params.resourceVersion}`;
+      const layerRelativePath = params.layerRelativePath;
+
+      if (attempts <= this.syncAttempts) {
+        try {
+          this.logger.info(`Running sync TOC task for taskId: ${tocTask.id}, on jobId=${tocTask.jobId}, attempt: ${attempts}`);
+          const tocContentString = JSON.stringify(params.tocData);
+          this.logger.info(`sign and upload toc data ${tocContentString}`);
+          const tocContentBuffer = Buffer.from(tocContentString);
+          await this.signAndUploadJson(`${layerRelativePath}/toc.json`, tocContentBuffer);
+          await this.queueClient.queueHandlerForTocTasks.ack(jobId, taskId);
+          await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
+        } catch (error) {
+          await this.queueClient.queueHandlerForTocTasks.reject(jobId, taskId, true, (error as Error).message);
+          await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
+        }
+      } else {
+        await this.queueClient.queueHandlerForTocTasks.reject(jobId, taskId, false);
         await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
       }
     }

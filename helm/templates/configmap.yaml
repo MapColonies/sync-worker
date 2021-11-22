@@ -34,5 +34,6 @@ data:
   QUEUE_DEQUEUE_INTERVAL_MS: {{ .Values.env.queue.dequeueIntervalMs | quote }}
   QUEUE_HEART_BEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatManagerBaseUrl | quote }}
   QUEUE_JOB_TYPE: {{ .Values.env.queue.jobType | quote }}
-  QUEUE_TASK_TYPE: {{ .Values.env.queue.taskType | quote }}
+  QUEUE_TILES_TASK_TYPE: {{ .Values.env.queue.tilesTaskType | quote }}
+  QUEUE_TOC_TASK_TYPE: {{ .Values.env.queue.tocTaskType | quote }}
 {{- end }}

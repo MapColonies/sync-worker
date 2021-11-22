@@ -77,6 +77,7 @@
       "__format": "number"
     },
     "jobType": "QUEUE_JOB_TYPE",
-    "taskType": "QUEUE_TASK_TYPE"
+    "tilesTaskType": "QUEUE_TILES_TASK_TYPE",
+    "tocTaskType": "QUEUE_TOC_TASK_TYPE"
   }
 }
