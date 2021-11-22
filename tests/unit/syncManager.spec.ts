@@ -36,10 +36,6 @@ const cryptoConfig = config.get<ICryptoConfig>('crypto');
 const tilesArray = [{ zoom: 0, x: 0, y: 1 }];
 
 describe('syncManager', () => {
-  beforeAll(function () {
-    jest.useFakeTimers('legacy');
-  });
-
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     fsReadFileSync = jest.spyOn(fs, 'readFileSync');
@@ -82,10 +78,6 @@ describe('syncManager', () => {
     container.clearInstances();
     jest.resetAllMocks();
     jest.restoreAllMocks();
-  });
-
-  afterAll(function () {
-    jest.useRealTimers();
   });
 
   describe('#runSync', () => {
