@@ -32,10 +32,12 @@ server.listen(port, () => {
 const mainLoop = async (): Promise<void> => {
   const isRunning = true;
   logger.info(`tiles signature is set to: ${tilesConfig.sigIsNeeded.toString()}`);
+  const dequeueIntervalMs = config.get<number>('queue.dequeueIntervalMs');
   //eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (isRunning) {
     try {
       await syncManager.runSync();
+      await new Promise((resolve) => setTimeout(resolve, dequeueIntervalMs));
     } catch (error) {
       logger.error(`mainLoop: Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }

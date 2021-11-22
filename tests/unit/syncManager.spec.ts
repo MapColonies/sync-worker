@@ -15,12 +15,14 @@ import * as utils from '../../src/common/utils';
 import { gatewayClientMock, uploadJsonToGWMock } from '../mocks/clients/gatewayClient';
 
 let syncManager: SyncManager;
-let waitForTaskStub: jest.SpyInstance;
+let dequeueStub: jest.SpyInstance;
 let uploadTilesStub: jest.SpyInstance;
 let generateSignedFileStub: jest.SpyInstance;
 let updateTilesCountStub: jest.SpyInstance;
-let ackStub: jest.SpyInstance;
-let rejectStub: jest.SpyInstance;
+let ackStubForTileTasks: jest.SpyInstance;
+let ackStubForTocTasks: jest.SpyInstance;
+let rejectStubForTileTasks: jest.SpyInstance;
+let rejectStubForTocTasks: jest.SpyInstance;
 let tilesGeneratorStub: jest.SpyInstance;
 let notifyNifiOnCompleteStub: jest.SpyInstance;
 let isFileExistsStub: jest.SpyInstance;
@@ -35,7 +37,7 @@ const tilesArray = [{ zoom: 0, x: 0, y: 1 }];
 
 describe('syncManager', () => {
   beforeAll(function () {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
   });
 
   beforeEach(() => {
@@ -54,8 +56,10 @@ describe('syncManager', () => {
       .mockImplementation(() => Buffer.from('mock_png_data/testId/testVersion/testProductType/0/0/1.png'));
     uploadTilesStub = jest.spyOn(tilesManager, 'uploadTile').mockImplementation(async () => Promise.resolve());
     updateTilesCountStub = jest.spyOn(tilesManager, 'updateTilesCount');
-    ackStub = jest.spyOn(queueClient.queueHandler, 'ack').mockImplementation(async () => Promise.resolve());
-    rejectStub = jest.spyOn(queueClient.queueHandler, 'reject').mockImplementation(async () => Promise.resolve());
+    ackStubForTileTasks = jest.spyOn(queueClient.queueHandlerForTileTasks, 'ack').mockImplementation(async () => Promise.resolve());
+    ackStubForTocTasks = jest.spyOn(queueClient.queueHandlerForTocTasks, 'ack').mockImplementation(async () => Promise.resolve());
+    rejectStubForTileTasks = jest.spyOn(queueClient.queueHandlerForTileTasks, 'reject').mockImplementation(async () => Promise.resolve());
+    rejectStubForTocTasks = jest.spyOn(queueClient.queueHandlerForTocTasks, 'reject').mockImplementation(async () => Promise.resolve());
     tilesGeneratorStub = jest.spyOn(tilesGenerator, 'tilesGenerator');
     notifyNifiOnCompleteStub = jest.spyOn(nifiClient, 'notifyNifiOnComplete').mockImplementation(async () => Promise.resolve());
     isFileExistsStub = jest.spyOn(utils, 'isFileExists');
@@ -80,6 +84,10 @@ describe('syncManager', () => {
     jest.restoreAllMocks();
   });
 
+  afterAll(function () {
+    jest.useRealTimers();
+  });
+
   describe('#runSync', () => {
     it('should successfully sign and upload file', async function () {
       // mock
@@ -88,11 +96,13 @@ describe('syncManager', () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const queueClient = container.resolve(QueueClient);
       const task = getTask();
-      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
+      jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(null);
+      dequeueStub = jest.spyOn(queueClient.queueHandlerForTileTasks, 'dequeue').mockResolvedValue(task);
+      jest.spyOn(syncManager, 'handleTocTask').mockResolvedValue(undefined);
 
       tilesGeneratorStub.mockImplementation(() => {
-        if (waitForTaskStub.mock.calls.length !== 1) {
-          throw new Error('invalid call order: waitForTask should be called before tilesGenerator');
+        if (dequeueStub.mock.calls.length !== 1) {
+          throw new Error('invalid call order: dequeue should be called before tilesGenerator');
         }
         return tilesArray;
       });
@@ -118,7 +128,7 @@ describe('syncManager', () => {
         return Promise.resolve();
       });
 
-      ackStub.mockImplementation(async () => {
+      ackStubForTileTasks.mockImplementation(async () => {
         if (updateTilesCountStub.mock.calls.length !== 1) {
           throw new Error('invalid call order: updateTilesCount should be called before ack');
         }
@@ -126,7 +136,7 @@ describe('syncManager', () => {
       });
 
       notifyNifiOnCompleteStub.mockImplementation(async () => {
-        if (ackStub.mock.calls.length !== 1) {
+        if (ackStubForTileTasks.mock.calls.length !== 1) {
           throw new Error('invalid call order: ack should be called before notifyNifiOnSuccess');
         }
         return Promise.resolve();
@@ -134,32 +144,33 @@ describe('syncManager', () => {
 
       // expectation;
       await expect(syncManager.runSync()).resolves.not.toThrow();
-      expect(waitForTaskStub).toHaveBeenCalledTimes(1);
+      expect(dequeueStub).toHaveBeenCalledTimes(1);
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(1);
       expect(uploadTilesStub).toHaveBeenCalledTimes(1);
-      expect(ackStub).toHaveBeenCalledTimes(1);
+      expect(ackStubForTileTasks).toHaveBeenCalledTimes(1);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(1);
       expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
-      expect(rejectStub).toHaveBeenCalledTimes(0);
-      expect(ackStub).toHaveBeenCalledWith(task.jobId, task.id);
+      expect(rejectStubForTileTasks).toHaveBeenCalledTimes(0);
+      expect(ackStubForTileTasks).toHaveBeenCalledWith(task.jobId, task.id);
     });
 
     it('should successfully sign and upload toc.json file', async function () {
       const queueClient = container.resolve(QueueClient);
       const taskWithTocData = getTask();
       (taskWithTocData.parameters as { tocData: Record<string, unknown> }).tocData = { todTestFata: 'data' };
-      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(taskWithTocData);
+      dequeueStub = jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(taskWithTocData);
+      jest.spyOn(syncManager, 'handleTilesTask').mockResolvedValue(undefined);
 
       generateSignedFileStub.mockImplementation(() => {
-        if (waitForTaskStub.mock.calls.length !== 1) {
-          throw new Error('invalid call order: waitForTask should be called before generateSignedFile');
+        if (dequeueStub.mock.calls.length !== 1) {
+          throw new Error('invalid call order: dequeue should be called before generateSignedFile');
         }
         return tilesArray;
       });
 
       notifyNifiOnCompleteStub.mockImplementation(async () => {
-        if (ackStub.mock.calls.length !== 1) {
+        if (ackStubForTocTasks.mock.calls.length !== 1) {
           throw new Error('invalid call order: ack should be called before notifyNifiOnSuccess');
         }
         return Promise.resolve();
@@ -167,34 +178,35 @@ describe('syncManager', () => {
 
       await expect(syncManager.runSync()).resolves.not.toThrow();
       expect(uploadJsonToGWMock).toHaveBeenCalledTimes(1);
-      expect(waitForTaskStub).toHaveBeenCalledTimes(1);
+      expect(dequeueStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(1);
-      expect(ackStub).toHaveBeenCalledTimes(1);
+      expect(ackStubForTocTasks).toHaveBeenCalledTimes(1);
       expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
-      expect(rejectStub).toHaveBeenCalledTimes(0);
+      expect(rejectStubForTocTasks).toHaveBeenCalledTimes(0);
       expect(updateTilesCountStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(ackStub).toHaveBeenCalledWith(taskWithTocData.jobId, taskWithTocData.id);
+      expect(ackStubForTocTasks).toHaveBeenCalledWith(taskWithTocData.jobId, taskWithTocData.id);
     });
 
     it('should not sign and upload file if its not exists', async function () {
       // mock
       const queueClient = container.resolve(QueueClient);
       const task = getTask();
-      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
+      dequeueStub = jest.spyOn(queueClient.queueHandlerForTileTasks, 'dequeue').mockResolvedValue(task);
+      jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(null);
       isFileExistsStub.mockResolvedValueOnce(false);
       tilesGeneratorStub.mockReturnValue(tilesArray);
       // expectation;
       await expect(syncManager.runSync()).resolves.not.toThrow();
-      expect(waitForTaskStub).toHaveBeenCalledTimes(1);
+      expect(dequeueStub).toHaveBeenCalledTimes(1);
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(ackStub).toHaveBeenCalledTimes(1);
+      expect(ackStubForTileTasks).toHaveBeenCalledTimes(1);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(1);
       expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
-      expect(rejectStub).toHaveBeenCalledTimes(0);
-      expect(ackStub).toHaveBeenCalledWith(task.jobId, task.id);
+      expect(rejectStubForTileTasks).toHaveBeenCalledTimes(0);
+      expect(ackStubForTileTasks).toHaveBeenCalledWith(task.jobId, task.id);
     });
 
     it('should reject task due max attempts', async function () {
@@ -202,7 +214,8 @@ describe('syncManager', () => {
       const queueClient = container.resolve(QueueClient);
       const task = getTask();
       task.attempts = 6;
-      waitForTaskStub = jest.spyOn(queueClient.queueHandler, 'waitForTask').mockResolvedValue(task);
+      jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(null);
+      dequeueStub = jest.spyOn(queueClient.queueHandlerForTileTasks, 'dequeue').mockResolvedValue(task);
       isFileExistsStub.mockResolvedValueOnce(true);
       isFileExistsStub.mockResolvedValue(true);
 
@@ -212,15 +225,15 @@ describe('syncManager', () => {
       };
       // expectation;
       await expect(action()).resolves.not.toThrow();
-      expect(waitForTaskStub).toHaveBeenCalledTimes(1);
+      expect(dequeueStub).toHaveBeenCalledTimes(1);
       expect(updateTilesCountStub).toHaveBeenCalledTimes(0);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(ackStub).toHaveBeenCalledTimes(0);
+      expect(ackStubForTileTasks).toHaveBeenCalledTimes(0);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(0);
       expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
-      expect(rejectStub).toHaveBeenCalledTimes(1);
-      expect(rejectStub).toHaveBeenCalledWith(task.jobId, task.id, false);
+      expect(rejectStubForTileTasks).toHaveBeenCalledTimes(1);
+      expect(rejectStubForTileTasks).toHaveBeenCalledWith(task.jobId, task.id, false);
     });
   });
 });

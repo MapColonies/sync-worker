@@ -32,7 +32,6 @@ interface IParameters {
 @singleton()
 export class SyncManager {
   private readonly syncAttempts: number;
-  private readonly dequeueIntervalMs: number;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
@@ -46,13 +45,11 @@ export class SyncManager {
     private readonly gatewayClient: GatewayClient
   ) {
     this.syncAttempts = this.config.get<number>('syncAttempts');
-    this.dequeueIntervalMs = this.config.get<number>('queue.dequeueIntervalMs');
   }
 
   public async runSync(): Promise<void> {
     await this.handleTocTask();
     await this.handleTilesTask();
-    await new Promise((resolve) => setTimeout(resolve, this.dequeueIntervalMs));
   }
 
   public async handleTilesTask(): Promise<void> {
