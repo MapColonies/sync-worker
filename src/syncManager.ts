@@ -46,11 +46,10 @@ export class SyncManager {
     private readonly gatewayClient: GatewayClient
   ) {
     this.syncAttempts = this.config.get<number>('syncAttempts');
-    this.dequeueIntervalMs = 4000; // this.config.get<number>('queue.dequeueIntervalMs');
+    this.dequeueIntervalMs = this.config.get<number>('queue.dequeueIntervalMs');
   }
 
   public async runSync(): Promise<void> {
-    this.logger.debug(`[SyncManager][runSync_waitForTask]`);
     await this.handleTocTask();
     await this.handleTilesTask();
     await new Promise((resolve) => setTimeout(resolve, this.dequeueIntervalMs));
@@ -69,7 +68,7 @@ export class SyncManager {
 
       if (attempts <= this.syncAttempts) {
         try {
-          this.logger.info(`Running sync task for taskId: ${tilesTask.id}, on jobId=${tilesTask.jobId}, attempt: ${attempts}`);
+          this.logger.info(`Running sync tiles task for taskId: ${tilesTask.id}, on jobId=${tilesTask.jobId}, attempt: ${attempts}`);
           this.logger.info(`sign and upload tiles`);
           const generator = tilesGenerator(batch);
           let batchArray = [];
