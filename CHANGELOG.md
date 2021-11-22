@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/MapColonies/sync-worker/compare/v1.3.0...v1.4.0) (2021-11-22)
+
+
+### Features
+
+* Support toc different task type's ([#7](https://github.com/MapColonies/sync-worker/issues/7)) ([95286a1](https://github.com/MapColonies/sync-worker/commit/95286a18e171ead549d8813322b61079a3e66cde))
+
+
+### Bug Fixes
+
+* hot fix helm chart ([#8](https://github.com/MapColonies/sync-worker/issues/8)) ([1c1403f](https://github.com/MapColonies/sync-worker/commit/1c1403fa03c638c3901aa85ca88c7ea36e999257))
+
 ## [1.3.0](https://github.com/MapColonies/sync-worker/compare/v1.2.0...v1.3.0) (2021-11-16)
 
 
