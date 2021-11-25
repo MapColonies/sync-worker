@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
@@ -15,15 +16,15 @@ export class GatewayClient extends HttpClient {
     this.gatewayJsonRouteId = this.config.get<string>('gateway.jsonRouteId');
   }
 
-  public async uploadImageToGW(buffer: Buffer, filename: string): Promise<void> {
-    return this.internalUploadFile(this.gatewayImageRouteId, buffer, filename);
+  public async uploadImageToGW(data: Buffer | Readable, filename: string): Promise<void> {
+    return this.internalUploadFile(this.gatewayImageRouteId, data, filename);
   }
 
   public async uploadJsonToGW(buffer: Buffer, filename: string): Promise<void> {
     return this.internalUploadFile(this.gatewayJsonRouteId, buffer, filename);
   }
 
-  private async internalUploadFile(routeId: string, buffer: Buffer, filename: string): Promise<void> {
+  private async internalUploadFile(routeId: string, data: Buffer | Readable, filename: string): Promise<void> {
     this.axiosOptions.headers = {
       'content-type': 'application/octet-stream',
     };
@@ -31,6 +32,6 @@ export class GatewayClient extends HttpClient {
       filename: encodeURIComponent(filename),
       routeId: routeId,
     };
-    await this.post('/', buffer, queryParams);
+    await this.post('/', data, queryParams);
   }
 }

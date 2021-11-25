@@ -58,5 +58,14 @@
     "attempts": 5,
     "delay": "exponential",
     "shouldResetTimeout": true
+  },
+  "storageProvider": "s3",
+  "useStreams": true,
+  "S3": {
+    "accessKeyId": "minioadmin",
+    "secretAccessKey": "minioadmin",
+    "endpoint": "http://localhost:9000",
+    "bucket": "mapping-images",
+    "forcePathStyle": true
   }
 }

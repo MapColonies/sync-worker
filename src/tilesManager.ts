@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
 import { GatewayClient } from './clients/services/gatewayClient';
@@ -24,9 +25,9 @@ export class TilesManager {
     }
   }
 
-  public async uploadTile(tileRelativePath: string, buffer: Buffer): Promise<void> {
+  public async uploadTile(tileRelativePath: string, data: Buffer | Readable): Promise<void> {
     try {
-      await this.gatewayClient.uploadImageToGW(buffer, tileRelativePath);
+      await this.gatewayClient.uploadImageToGW(data, tileRelativePath);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       this.logger.error(`upload failed for tile: ${tileRelativePath} with error: ${error}`);

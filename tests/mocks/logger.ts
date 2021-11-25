@@ -1,14 +1,11 @@
-interface ILogger {
-  info: (level: string, message: string) => void;
-  debug: (level: string, message: string) => void;
-  error: (level: string, message: string) => void;
-}
+import { Logger } from '@map-colonies/js-logger';
 
 const logMock = jest.fn();
 const logger = {
-  info: jest.fn(),
-  debug: jest.fn(),
-  error: jest.fn(),
-} as ILogger;
+  info: logMock,
+  debug: logMock,
+  warn: logMock,
+  error: logMock,
+} as unknown as Logger;
 
 export { logMock, logger };

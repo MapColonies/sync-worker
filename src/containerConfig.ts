@@ -8,6 +8,7 @@ import { Services } from './common/constants';
 import { tracing } from './common/tracing';
 import { InjectionObject, registerDependencies } from './common/dependencyRegistration';
 import { ICryptoConfig, IGatewayConfig, IQueueConfig, ITilesConfig } from './common/interfaces';
+import { getProviders } from './providers/providerManager';
 
 export interface RegisterOptions {
   override?: InjectionObject<unknown>[];
@@ -47,6 +48,7 @@ export const registerExternalValues = (options?: RegisterOptions): DependencyCon
         },
       },
     },
+    ...getProviders(config, logger),
   ];
 
   return registerDependencies(dependencies, options?.override, options?.useChild);
