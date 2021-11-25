@@ -1,17 +1,15 @@
 import path from 'path';
-import { promises as fsp } from 'fs';
-import { IConfig } from 'config';
 import { Logger } from '@map-colonies/js-logger';
 import { inject, singleton } from 'tsyringe';
 import { tilesGenerator } from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import { QueueClient } from './clients/queueClient';
 import { Services } from './common/constants';
-import { ICryptoConfig, ITilesConfig } from './common/interfaces';
+import { IConfig, ITilesConfig } from './common/interfaces';
 import { CryptoManager } from './cryptoManager';
 import { TilesManager } from './tilesManager';
-import { isFileExists } from './common/utils';
 import { NifiClient } from './clients/services/nifiClient';
 import { GatewayClient } from './clients/services/gatewayClient';
+import { IStorageProvider } from './providers/iStorageProvider';
 
 interface ITileRange {
   minX: number;
@@ -32,12 +30,13 @@ interface IParameters {
 @singleton()
 export class SyncManager {
   private readonly syncAttempts: number;
+  private readonly useStreams: boolean;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
     @inject(Services.TILES_CONFIG) private readonly tilesConfig: ITilesConfig,
-    @inject(Services.CRYPTO_CONFIG) private readonly cryptoConfig: ICryptoConfig,
+    @inject(Services.STORAGE_PROVIDER) private readonly storageProvider: IStorageProvider,
     private readonly queueClient: QueueClient,
     private readonly tilesManager: TilesManager,
     private readonly cryptoManager: CryptoManager,
@@ -45,6 +44,7 @@ export class SyncManager {
     private readonly gatewayClient: GatewayClient
   ) {
     this.syncAttempts = this.config.get<number>('syncAttempts');
+    this.useStreams = this.config.get<boolean>('useStreams');
   }
 
   public async runSync(): Promise<void> {
@@ -75,7 +75,7 @@ export class SyncManager {
             const tileRelativePath = `${layerRelativePath}/${tile.zoom}/${tile.x}/${tile.y}.${this.tilesConfig.format}`;
             const fullPath = path.join(this.tilesConfig.path, tileRelativePath);
 
-            if (await isFileExists(fullPath)) {
+            if (await this.storageProvider.exist(fullPath)) {
               batchArray.push(this.signAndUpload(fullPath, tileRelativePath));
             }
 
@@ -140,16 +140,24 @@ export class SyncManager {
   }
 
   private async signAndUpload(fullPath: string, tileRelativePath: string): Promise<void> {
-    let fileBuffer = await fsp.readFile(fullPath);
-    if (this.tilesConfig.sigIsNeeded) {
-      fileBuffer = this.cryptoManager.generateSignedFile(fullPath, fileBuffer);
+    if (this.useStreams) {
+      let stream = this.storageProvider.getFileStream(fullPath);
+      if (this.tilesConfig.sigIsNeeded) {
+        stream = this.cryptoManager.signStream(fullPath, stream);
+      }
+      await this.tilesManager.uploadTile(tileRelativePath, stream);
+    } else {
+      let fileBuffer = await this.storageProvider.readFile(fullPath);
+      if (this.tilesConfig.sigIsNeeded) {
+        fileBuffer = this.cryptoManager.signBuffer(fullPath, fileBuffer);
+      }
+      await this.tilesManager.uploadTile(tileRelativePath, fileBuffer);
     }
-    await this.tilesManager.uploadTile(tileRelativePath, fileBuffer);
   }
 
   private async signAndUploadJson(fileName: string, buffer: Buffer): Promise<void> {
     if (this.tilesConfig.sigIsNeeded) {
-      buffer = this.cryptoManager.generateSignedFile(fileName, buffer);
+      buffer = this.cryptoManager.signBuffer(fileName, buffer);
     }
     await this.gatewayClient.uploadJsonToGW(buffer, fileName);
   }

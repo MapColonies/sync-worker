@@ -14,4 +14,5 @@ export enum Services {
   TILES_CONFIG = 'ITilesConfig',
   CRYPTO_CONFIG = 'ICryptoConfig',
   GATEWAY_CONFIG = 'IGatewayConfig',
+  STORAGE_PROVIDER = 'storageProvider',
 }

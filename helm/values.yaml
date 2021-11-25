@@ -65,6 +65,17 @@ env:
     jobType: "Sync"
     tilesTaskType: "tilesSync"
     tocTaskType: "tocSync"
+  storageProvider: "FS"
+  useStreams: true
+  S3:
+    endpoint: "http://localhost:9000"
+    bucket: "mapping-images"
+    forcePathStyle: true
+    secret:
+      name: raster-tiles-s3-secret
+      createSecret: false # secret should be created on higher level for deployments with multiple services
+      accessKeyId: # used only when creating secret
+      secretAccessKey: # used only when creating secret
 resources:
   enabled: false
   value:
