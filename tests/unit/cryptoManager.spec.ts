@@ -6,6 +6,7 @@ import jsLogger from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
 import { CryptoManager } from '../../src/cryptoManager';
 import { ICryptoConfig } from '../../src/common/interfaces';
+import { configMock, init as initConfig, setValue as setConfigValue } from '../mocks/config';
 
 // fsp module stubs
 let concatStub: jest.SpyInstance;
@@ -49,6 +50,8 @@ const streamToString = async (stream: Readable): Promise<string> => {
 
 describe('cryptoManager', () => {
   beforeEach(function () {
+    initConfig();
+    setConfigValue('tiles.sigIsNeeded', true);
     // crpyto spys
     createHashStub = jest.spyOn(crypto, 'createHash');
     createCipherivStub = jest.spyOn(crypto, 'createCipheriv');
@@ -56,7 +59,7 @@ describe('cryptoManager', () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     fsReadFileSync = jest.spyOn(fs, 'readFileSync');
     fsReadFileSync.mockReturnValue(mockKeyPem);
-    cryptoManager = new CryptoManager(jsLogger({ enabled: false }), cryptoConfig);
+    cryptoManager = new CryptoManager(jsLogger({ enabled: false }), cryptoConfig, configMock);
   });
 
   afterEach(() => {
@@ -98,7 +101,7 @@ describe('cryptoManager', () => {
       };
       // action
       const action = () => {
-        cryptoManager = new CryptoManager(jsLogger({ enabled: false }), mockCryptoConfig);
+        cryptoManager = new CryptoManager(jsLogger({ enabled: false }), mockCryptoConfig, configMock);
       };
       // expectation;
       expect(action).toThrow();
@@ -140,10 +143,6 @@ describe('cryptoManager', () => {
   });
 
   describe('#signStream', () => {
-    // beforeEach(()=>{
-
-    // })
-
     it('should successfully generate singed files', async function () {
       // action
       const fileStream = getMockFileStream();
@@ -169,7 +168,7 @@ describe('cryptoManager', () => {
       };
       // action
       const action = () => {
-        cryptoManager = new CryptoManager(jsLogger({ enabled: false }), mockCryptoConfig);
+        cryptoManager = new CryptoManager(jsLogger({ enabled: false }), mockCryptoConfig, configMock);
       };
       // expectation;
       expect(action).toThrow();

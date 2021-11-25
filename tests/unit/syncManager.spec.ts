@@ -35,13 +35,19 @@ let tilesManager: TilesManager;
 let queueClient: QueueClient;
 let nifiClient: NifiClient;
 
-const tilesConfig = config.get<ITilesConfig>('tiles');
+const tilesConfig = {
+  path: 'tests/mocks/tiles',
+  format: 'png',
+  uploadBatchSize: 100,
+  sigIsNeeded: true,
+};
 
 const tilesArray = [{ zoom: 0, x: 0, y: 1 }];
 
 describe('syncManager', () => {
   beforeEach(() => {
     initConfig();
+    setConfigValue('tiles.sigIsNeeded', true);
     fsReadFileSync = jest.spyOn(fs, 'readFileSync');
     fsReadFileSync.mockReturnValue('keyMock');
 
