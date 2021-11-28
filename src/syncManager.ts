@@ -47,12 +47,13 @@ export class SyncManager {
     this.useStreams = this.config.get<boolean>('useStreams');
   }
 
-  public async runSync(): Promise<void> {
-    await this.handleTocTask();
-    await this.handleTilesTask();
+  public async runSync(): Promise<boolean> {
+    const tocTaskProcessed = await this.handleTocTask();
+    const tilesTaskProcessed = await this.handleTilesTask();
+    return tocTaskProcessed || tilesTaskProcessed;
   }
 
-  public async handleTilesTask(): Promise<void> {
+  public async handleTilesTask(): Promise<boolean> {
     const tilesTask = await this.queueClient.queueHandlerForTileTasks.dequeue();
     if (tilesTask) {
       const params = tilesTask.parameters as IParameters;
@@ -107,9 +108,10 @@ export class SyncManager {
         await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
       }
     }
+    return Boolean(tilesTask);
   }
 
-  public async handleTocTask(): Promise<void> {
+  public async handleTocTask(): Promise<boolean> {
     const tocTask = await this.queueClient.queueHandlerForTocTasks.dequeue();
     if (tocTask) {
       const params = tocTask.parameters as IParameters;
@@ -137,6 +139,7 @@ export class SyncManager {
         await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
       }
     }
+    return Boolean(tocTask);
   }
 
   private async signAndUpload(fullPath: string, tileRelativePath: string): Promise<void> {

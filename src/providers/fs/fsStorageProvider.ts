@@ -1,7 +1,9 @@
 import { promises as fsp, createReadStream, constants } from 'fs';
 import { Readable } from 'stream';
+import { autoInjectable } from 'tsyringe';
 import { IStorageProvider } from '../iStorageProvider';
 
+@autoInjectable()
 export class FsStorageProvider implements IStorageProvider {
   public async readFile(path: string): Promise<Buffer> {
     return fsp.readFile(path);

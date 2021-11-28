@@ -36,10 +36,13 @@ const mainLoop = async (): Promise<void> => {
   //eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (isRunning) {
     try {
-      await syncManager.runSync();
-      await new Promise((resolve) => setTimeout(resolve, dequeueIntervalMs));
+      const taskProcessed = await syncManager.runSync();
+      if (!taskProcessed) {
+        await new Promise((resolve) => setTimeout(resolve, dequeueIntervalMs));
+      }
     } catch (error) {
       logger.error(`mainLoop: Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+      await new Promise((resolve) => setTimeout(resolve, dequeueIntervalMs));
     }
   }
 };
