@@ -33,6 +33,12 @@ spec:
       - name: sources-storage
         persistentVolumeClaim:
           claimName: {{ .Values.storage.internalPvc.name }}
+      - name: key-file
+        configMap:
+          name: {{ .Release.Name }}-{{ $chartName }}-configmap
+          items:
+          - key: "PRIVATE_KEY"
+            path: "private_key.pem"
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
@@ -64,15 +70,18 @@ spec:
             - name: http
               containerPort: {{ .Values.env.targetPort }}
               protocol: {{ .Values.env.protocol }}
-          livenessProbe:
-            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
-            httpGet:
-              path: /liveness
-              port: http
+          # livenessProbe:
+          #   initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+          #   httpGet:
+          #     path: /liveness
+          #     # port: http
           volumeMounts: 
             - name: sources-storage
               mountPath: {{ .Values.storage.internalPvc.mountPath }}
               subPath: tiles
+            - mountPath: "/private_key.pem"
+              name: key-file
+              subPath: private_key.pem
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}

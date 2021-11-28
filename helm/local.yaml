@@ -54,7 +54,7 @@ env:
     sigIsNeeded: false
   crypto:
     readFileEncoding: ""
-    pem: ""
+    pem: "keys/private_key.pem"
     algoritm: ""
     shaSize: ""
   queue:
@@ -65,7 +65,7 @@ env:
     jobType: "Sync"
     tilesTaskType: "tilesSync"
     tocTaskType: "tocSync"
-  storageProvider: "fs"
+  storageProvider: "FS"
   useStreams: true
   S3:
     endpoint: "http://localhost:9000"
