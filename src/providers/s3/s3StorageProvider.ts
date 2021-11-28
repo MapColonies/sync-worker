@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 import { S3, Request, AWSError } from 'aws-sdk';
-import { inject } from 'tsyringe';
+import { autoInjectable, inject } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import httpStatusCode from 'http-status-codes';
 import { Services } from '../../common/constants';
@@ -8,11 +8,13 @@ import { IStorageProvider } from '../iStorageProvider';
 import { IConfig } from '../../common/interfaces';
 import { IS3Config } from './iS3Config';
 
+@autoInjectable()
 export class S3StorageProvider implements IStorageProvider {
   private readonly s3Config: IS3Config;
   private readonly s3: S3;
 
   public constructor(@inject(Services.LOGGER) private readonly logger: Logger, @inject(Services.CONFIG) config: IConfig) {
+    console.log('start of const');
     this.s3Config = config.get<IS3Config>('S3');
     this.s3 = new S3({
       credentials: {
@@ -22,6 +24,7 @@ export class S3StorageProvider implements IStorageProvider {
       endpoint: this.s3Config.endpoint,
       s3ForcePathStyle: this.s3Config.forcePathStyle,
     });
+    console.log('end of const');
   }
 
   public async readFile(path: string): Promise<Buffer> {
