@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 import { S3, Request, AWSError } from 'aws-sdk';
-import { inject } from 'tsyringe';
+import { autoInjectable, inject } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import httpStatusCode from 'http-status-codes';
 import { Services } from '../../common/constants';
@@ -8,6 +8,7 @@ import { IStorageProvider } from '../iStorageProvider';
 import { IConfig } from '../../common/interfaces';
 import { IS3Config } from './iS3Config';
 
+@autoInjectable()
 export class S3StorageProvider implements IStorageProvider {
   private readonly s3Config: IS3Config;
   private readonly s3: S3;

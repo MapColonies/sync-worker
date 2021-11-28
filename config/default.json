@@ -49,7 +49,7 @@
     "jobManagerBaseUrl": "http://localhost:8082",
     "heartbeatManagerBaseUrl": "http://localhost:8083",
     "dequeueIntervalMs": 1000,
-    "heartbeatIntervalMs": 3000,
+    "heartbeatIntervalMs": 300,
     "jobType": "Sync",
     "tilesTaskType": "tilesSync",
     "tocTaskType": "tocSync"

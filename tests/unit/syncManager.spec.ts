@@ -1,6 +1,5 @@
 import { PassThrough } from 'stream';
 import fs from 'fs';
-import config from 'config';
 import jsLogger from '@map-colonies/js-logger';
 import * as tilesGenerator from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import { DependencyContainer } from 'tsyringe';
@@ -8,7 +7,6 @@ import { SyncManager } from '../../src/syncManager';
 import { getTask } from '../mocks/files/task';
 import { QueueClient } from '../../src/clients/queueClient';
 import { CryptoManager } from '../../src/cryptoManager';
-import { ITilesConfig } from '../../src/common/interfaces';
 import { TilesManager } from '../../src/tilesManager';
 import { NifiClient } from '../../src/clients/services/nifiClient';
 import { registerExternalValues } from '../ testContainerConfig';
