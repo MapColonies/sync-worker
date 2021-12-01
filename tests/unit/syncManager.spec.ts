@@ -1,6 +1,5 @@
 import { PassThrough } from 'stream';
 import fs from 'fs';
-import config from 'config';
 import jsLogger from '@map-colonies/js-logger';
 import * as tilesGenerator from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import { DependencyContainer } from 'tsyringe';
@@ -8,7 +7,6 @@ import { SyncManager } from '../../src/syncManager';
 import { getTask } from '../mocks/files/task';
 import { QueueClient } from '../../src/clients/queueClient';
 import { CryptoManager } from '../../src/cryptoManager';
-import { ITilesConfig } from '../../src/common/interfaces';
 import { TilesManager } from '../../src/tilesManager';
 import { NifiClient } from '../../src/clients/services/nifiClient';
 import { registerExternalValues } from '../ testContainerConfig';
@@ -86,7 +84,7 @@ describe('syncManager', () => {
       const task = getTask();
       jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(null);
       dequeueStub = jest.spyOn(queueClient.queueHandlerForTileTasks, 'dequeue').mockResolvedValue(task);
-      jest.spyOn(syncManager, 'handleTocTask').mockResolvedValue(undefined);
+      jest.spyOn(syncManager, 'handleTocTask').mockResolvedValue(false);
 
       tilesGeneratorStub.mockImplementation(() => {
         if (dequeueStub.mock.calls.length !== 1) {
@@ -153,7 +151,7 @@ describe('syncManager', () => {
       const task = getTask();
       jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(null);
       dequeueStub = jest.spyOn(queueClient.queueHandlerForTileTasks, 'dequeue').mockResolvedValue(task);
-      jest.spyOn(syncManager, 'handleTocTask').mockResolvedValue(undefined);
+      jest.spyOn(syncManager, 'handleTocTask').mockResolvedValue(false);
 
       tilesGeneratorStub.mockImplementation(() => {
         if (dequeueStub.mock.calls.length !== 1) {
@@ -216,7 +214,7 @@ describe('syncManager', () => {
       const taskWithTocData = getTask();
       (taskWithTocData.parameters as { tocData: Record<string, unknown> }).tocData = { todTestFata: 'data' };
       dequeueStub = jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(taskWithTocData);
-      jest.spyOn(syncManager, 'handleTilesTask').mockResolvedValue(undefined);
+      jest.spyOn(syncManager, 'handleTilesTask').mockResolvedValue(false);
 
       generateSignedFileStub.mockImplementation(() => {
         if (dequeueStub.mock.calls.length !== 1) {
@@ -254,7 +252,7 @@ describe('syncManager', () => {
       const taskWithTocData = getTask();
       (taskWithTocData.parameters as { tocData: Record<string, unknown> }).tocData = { tocTestData: 'data' };
       dequeueStub = jest.spyOn(queueClient.queueHandlerForTocTasks, 'dequeue').mockResolvedValue(taskWithTocData);
-      jest.spyOn(syncManager, 'handleTilesTask').mockResolvedValue(undefined);
+      jest.spyOn(syncManager, 'handleTilesTask').mockResolvedValue(false);
 
       generateSignedFileStub.mockImplementation(() => {
         if (dequeueStub.mock.calls.length !== 1) {

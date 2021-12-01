@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/MapColonies/sync-worker/compare/v1.5.0...v1.6.0) (2021-12-01)
+
+
+### Features
+
+* support basic authentication for gateway ([#11](https://github.com/MapColonies/sync-worker/issues/11)) ([24b1e5e](https://github.com/MapColonies/sync-worker/commit/24b1e5e5e7d82057a3acce154bfcab58d0e54576))
+
+## [1.5.0](https://github.com/MapColonies/sync-worker/compare/v1.4.0...v1.5.0) (2021-11-28)
+
+
+### Features
+
+* added s3 and streams support ([#9](https://github.com/MapColonies/sync-worker/issues/9)) ([79d5b98](https://github.com/MapColonies/sync-worker/commit/79d5b98bd1cad956641b238df8e4ef4287bb7dce))
+
 ## [1.4.0](https://github.com/MapColonies/sync-worker/compare/v1.3.0...v1.4.0) (2021-11-22)
 
 

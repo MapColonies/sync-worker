@@ -31,7 +31,12 @@
   "gateway": {
     "url": "http://localhost:8084",
     "imageRouteId": "",
-    "jsonRouteId": ""
+    "jsonRouteId": "",
+    "auth": {
+      "enabled": true,
+      "username": "user",
+      "password": "pass"
+    }
   },
   "tiles": {
     "path": "/path/to/tiles/directory",
@@ -48,8 +53,8 @@
   "queue": {
     "jobManagerBaseUrl": "http://localhost:8082",
     "heartbeatManagerBaseUrl": "http://localhost:8083",
-    "dequeueIntervalMs": 500,
-    "heartbeatIntervalMs": 5000,
+    "dequeueIntervalMs": 1000,
+    "heartbeatIntervalMs": 300,
     "jobType": "Sync",
     "tilesTaskType": "tilesSync",
     "tocTaskType": "tocSync"
