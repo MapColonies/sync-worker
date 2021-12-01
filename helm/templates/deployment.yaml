@@ -70,16 +70,16 @@ spec:
             - name: http
               containerPort: {{ .Values.env.targetPort }}
               protocol: {{ .Values.env.protocol }}
-          # livenessProbe:
-          #   initialDelaySeconds: {{ .Values.initialDelaySeconds }}
-          #   httpGet:
-          #     path: /liveness
-          #     # port: http
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            httpGet:
+              path: /liveness
+              port: http
           volumeMounts: 
             - name: sources-storage
               mountPath: {{ .Values.storage.internalPvc.mountPath }}
               subPath: tiles
-            - mountPath: "/private_key.pem"
+            - mountPath: "/usr/src/app/private_key.pem"
               name: key-file
               subPath: private_key.pem
           {{- if .Values.resources.enabled }}

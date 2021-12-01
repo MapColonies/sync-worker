@@ -1,0 +1,35 @@
+---
+# Source: sync-worker/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: asdfasdfasdfasdf-sync-worker-configmap
+data:
+  REQUEST_PAYLOAD_LIMIT: "1mb"
+  RESPONSE_COMPRESSION_ENABLED: "true"
+  LOG_LEVEL: "debug"
+  LOG_PRETTY_PRINT_ENABLED: "false"
+  
+  
+  LAYER_SPEC_BASE_URL: "http://localhost:8080"
+  NIFI_BASE_URL: "http://localhost:8083"
+  SYNC_ATTEMPTS: "3"
+  GATEWAY_URL: "http://localhost:8084"
+  GATEWAY_IMAGE_ROUTE_ID: ""
+  GATEWAY_JSON_ROUTE_ID: ""
+  TILES_PATH: "/layerSources"
+  TILES_UPLOAD_BATCH_SIZE: "100"
+  TILES_SIG_IS_NEEDED: "false"
+  # CRYPTO_PEM: ""
+  QUEUE_JOB_MANAGER_BASE_URL: "http://localhost:8082"
+  QUEUE_HEART_BEAT_MANAGER_BASE_URL: "0.5"
+  QUEUE_DEQUEUE_INTERVAL_MS: "3"
+  QUEUE_HEART_BEAT_INTERVAL_MS: "http://localhost:8085"
+  QUEUE_JOB_TYPE: "Sync"
+  QUEUE_TILES_TASK_TYPE: "tilesSync"
+  QUEUE_TOC_TASK_TYPE: "tocSync"
+  STORAGE_PROVIDER: "fs"
+  USE_STREAMS: "true"
+  S3_ENDPOINT: "http://localhost:9000"
+  S3_BUCKET: "mapping-images"
+  S3_FORCE_PATH_STYLE: "true"

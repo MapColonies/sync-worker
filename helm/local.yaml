@@ -11,7 +11,7 @@ initialDelaySeconds: 60
 nodePort: 30030 #for minikube deployment only
 
 cloudProvider:
-  dockerRegistryUrl: "my-registry"
+  dockerRegistryUrl: "10.45.130.11:5000"
   flavor: "azure"
 
 image:
@@ -54,7 +54,7 @@ env:
     sigIsNeeded: false
   crypto:
     readFileEncoding: ""
-    pem: "keys/private_key.pem"
+    pem: "keys/asdfasdf.pem"
     algoritm: ""
     shaSize: ""
   queue:
