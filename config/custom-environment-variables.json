@@ -48,7 +48,15 @@
   "gateway": {
     "url": "GATEWAY_URL",
     "imageRouteId": "GATEWAY_IMAGE_ROUTE_ID",
-    "jsonRouteId": "GATEWAY_JSON_ROUTE_ID"
+    "jsonRouteId": "GATEWAY_JSON_ROUTE_ID",
+    "auth": {
+      "enabled": {
+        "__name": "GATEWAY_AUTH_ENABLED",
+        "__format": "boolean"
+      },
+      "username": "GATEWAY_AUTH_USERNAME",
+      "password": "GATEWAY_AUTH_PASSWORD"
+    }
   },
   "tiles": {
     "path": "TILES_PATH",
