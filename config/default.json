@@ -31,7 +31,12 @@
   "gateway": {
     "url": "http://localhost:8084",
     "imageRouteId": "",
-    "jsonRouteId": ""
+    "jsonRouteId": "",
+    "auth": {
+      "enabled": true,
+      "username": "user",
+      "password": "pass"
+    }
   },
   "tiles": {
     "path": "/path/to/tiles/directory",
