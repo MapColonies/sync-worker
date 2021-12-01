@@ -35,7 +35,7 @@ export class GatewayClient extends HttpClient {
 
   private async internalUploadFile(routeId: string, data: Buffer | Readable, filename: string): Promise<void> {
     const addedHeaders = {
-      'Content-Type': 'application/octet-stream',
+      'content-type': 'application/octet-stream',
     };
     const queryParams = {
       filename: encodeURIComponent(filename),
