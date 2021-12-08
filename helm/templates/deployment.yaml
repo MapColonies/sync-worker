@@ -29,6 +29,10 @@ spec:
         run: {{ $releaseName }}-{{ $chartName }}
         {{- include "sync-worker.selectorLabels" . | nindent 8 }}
     spec:
+    {{- if .Values.cloudProvider.imagePullSecretName }}
+      imagePullSecrets:
+        - name: {{ .Values.cloudProvider.imagePullSecretName | quote }}
+    {{- end }}
     {{- if eq (upper .Values.env.storageProvider) "FS" }}
       volumes:
       - name: sources-storage
