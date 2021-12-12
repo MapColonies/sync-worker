@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/MapColonies/sync-worker/compare/v1.6.0...v1.7.0) (2021-12-12)
+
+
+### Features
+
+* send target to layer spec route ([#13](https://github.com/MapColonies/sync-worker/issues/13)) ([77a9f48](https://github.com/MapColonies/sync-worker/commit/77a9f48838df71dbafb8631f8800482f8baf908c))
+
+
+### Bug Fixes
+
+* Helm fixes ([#12](https://github.com/MapColonies/sync-worker/issues/12)) ([3fe9923](https://github.com/MapColonies/sync-worker/commit/3fe99230f3726edfc25966f785b61eab308436ba))
+
 ## [1.6.0](https://github.com/MapColonies/sync-worker/compare/v1.5.0...v1.6.0) (2021-12-01)
 
 
