@@ -10,8 +10,11 @@ interface ITilesCountUpdateRequest {
 
 @singleton()
 export class LayerSpecClient extends HttpClient {
+  private readonly target: string;
+
   public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.CONFIG) private readonly config: IConfig) {
     super(logger, config.get<string>('layerSpecBaseUrl'), 'LayerSpecClient', config.get<IHttpRetryConfig>('httpRetry'));
+    this.target = encodeURIComponent(`${this.config.get<string>('gateway.url')}`);
   }
 
   public async updateTilesCount(layerId: string, tilesCount: number): Promise<void> {
@@ -19,6 +22,6 @@ export class LayerSpecClient extends HttpClient {
       tilesBatchCount: tilesCount,
     };
     this.logger.info(`Updating ${tilesCount} tiles count layerId=${layerId}`);
-    await this.put(`/tilesCount/${layerId}`, updateRequest);
+    await this.put(`/tilesCount/${layerId}/${this.target}`, updateRequest);
   }
 }
