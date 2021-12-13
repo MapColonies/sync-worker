@@ -52,7 +52,7 @@ env:
     path: /layerSources
     format: png
     uploadBatchSize: 100
-    sigIsNeeded: false
+    sigIsNeeded: true
   crypto:
     readFileEncoding: ""
     pem: "path/to/key/file"
