@@ -38,3 +38,9 @@ export interface ICryptoConfig {
   shaSize: string;
   algoritm: string;
 }
+
+export interface IGatewayAuthConfig {
+  enabled: boolean;
+  username: string;
+  password: string;
+}

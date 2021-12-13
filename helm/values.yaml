@@ -12,6 +12,7 @@ nodePort: 30030 #for minikube deployment only
 
 cloudProvider:
   dockerRegistryUrl: "my-registry"
+  imagePullSecretName: "my-registry-secret"
   flavor: "azure"
 
 image:
@@ -60,8 +61,8 @@ env:
   queue:
     jobManagerBaseUrl: "http://localhost:8082"
     heartbeatManagerBaseUrl: "http://localhost:8085"
-    dequeueIntervalMs: 3
-    heartbeatIntervalMs: 0.5
+    dequeueIntervalMs: 1000
+    heartbeatIntervalMs: 300
     jobType: "Sync"
     tilesTaskType: "tilesSync"
     tocTaskType: "tocSync"
