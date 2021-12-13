@@ -44,5 +44,7 @@ data:
   {{ $globdata := .Files.Glob .Values.env.crypto.pem }}
   {{ if $globdata }}
   PRIVATE_KEY: {{ tpl (.Files.Get .Values.env.crypto.pem) . | quote }}
+  {{ else }}
+  {{- fail  (printf "Key file not found at path: %s" .Values.env.crypto.pem) }}
   {{- end }}
 {{- end }}

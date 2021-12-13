@@ -54,7 +54,7 @@ env:
     sigIsNeeded: false
   crypto:
     readFileEncoding: ""
-    pem: ""
+    pem: "path/to/key/file"
     algoritm: ""
     shaSize: ""
   queue:

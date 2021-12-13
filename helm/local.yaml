@@ -54,7 +54,7 @@ env:
     sigIsNeeded: false
   crypto:
     readFileEncoding: ""
-    pem: "keys/asdfasdf.pem"
+    pem: "path/to/key/file"
     algoritm: ""
     shaSize: ""
   queue:
