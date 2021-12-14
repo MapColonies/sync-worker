@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/MapColonies/sync-worker/compare/v1.7.0...v1.7.1) (2021-12-14)
+
+
+### Bug Fixes
+
+* providers injection ([c01d24c](https://github.com/MapColonies/sync-worker/commit/c01d24cf1f752a0facfdefc229d15014d75780fb))
+
 ## [1.7.0](https://github.com/MapColonies/sync-worker/compare/v1.6.0...v1.7.0) (2021-12-12)
 
 
