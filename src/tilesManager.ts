@@ -15,13 +15,13 @@ export class TilesManager {
     private readonly layerSpecClient: LayerSpecClient
   ) {}
 
-  public async updateTilesCount(layerId: string, tilesCount: number): Promise<void> {
+  public async updateTilesCount(layerId: string, tilesCount: number, target: string): Promise<void> {
     try {
-      this.logger.debug(`updating tiles count for layerId=${layerId}`);
-      await this.layerSpecClient.updateTilesCount(layerId, tilesCount);
+      this.logger.debug(`updating tiles count=${tilesCount}, for layerId=${layerId}, target=${target}`);
+      await this.layerSpecClient.updateTilesCount(layerId, tilesCount, target);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.logger.error(`tiles count update failed for layerId=${layerId} with error: ${error}`);
+      this.logger.error(`tiles count=${tilesCount}, update failed for layerId=${layerId}, target=${target}, with error: ${error}`);
     }
   }
 

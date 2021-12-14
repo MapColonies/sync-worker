@@ -14,11 +14,11 @@ export class LayerSpecClient extends HttpClient {
     super(logger, config.get<string>('layerSpecBaseUrl'), 'LayerSpecClient', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
-  public async updateTilesCount(layerId: string, tilesCount: number): Promise<void> {
+  public async updateTilesCount(layerId: string, tilesCount: number, target: string): Promise<void> {
     const updateRequest: ITilesCountUpdateRequest = {
       tilesBatchCount: tilesCount,
     };
-    this.logger.info(`Updating ${tilesCount} tiles count layerId=${layerId}`);
-    await this.put(`/tilesCount/${layerId}`, updateRequest);
+    this.logger.info(`Updating ${tilesCount} tiles count layerId=${layerId}, target=${target}`);
+    await this.put(`/tilesCount/${layerId}/${target}`, updateRequest);
   }
 }

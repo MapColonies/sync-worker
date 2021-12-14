@@ -28,7 +28,6 @@ data:
   TILES_PATH: {{ .Values.env.tiles.path | quote }}
   TILES_UPLOAD_BATCH_SIZE: {{ .Values.env.tiles.uploadBatchSize | quote }}
   TILES_SIG_IS_NEEDED: {{ .Values.env.tiles.sigIsNeeded | quote }}
-  CRYPTO_PEM: {{ .Values.env.crypto.pem | quote }}
   QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl | quote }}
   QUEUE_HEART_BEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatIntervalMs | quote }}
   QUEUE_DEQUEUE_INTERVAL_MS: {{ .Values.env.queue.dequeueIntervalMs | quote }}
@@ -41,4 +40,10 @@ data:
   S3_ENDPOINT: {{ .Values.env.S3.endpoint | quote }}
   S3_BUCKET: {{ .Values.env.S3.bucket | quote }}
   S3_FORCE_PATH_STYLE: {{ .Values.env.S3.forcePathStyle | quote }}
+  {{ $globdata := .Files.Glob .Values.env.crypto.pem }}
+  {{ if $globdata }}
+  PRIVATE_KEY: {{ tpl (.Files.Get .Values.env.crypto.pem) . | quote }}
+  {{ else }}
+  {{- fail  (printf "Key file not found at path: %s" .Values.env.crypto.pem) }}
+  {{- end }}
 {{- end }}

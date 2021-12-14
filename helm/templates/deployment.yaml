@@ -29,10 +29,26 @@ spec:
         run: {{ $releaseName }}-{{ $chartName }}
         {{- include "sync-worker.selectorLabels" . | nindent 8 }}
     spec:
+    {{- if .Values.cloudProvider.imagePullSecretName }}
+      imagePullSecrets:
+        - name: {{ .Values.cloudProvider.imagePullSecretName | quote }}
+    {{- end }}
+    {{- if or (eq (upper .Values.env.storageProvider) "FS") .Values.env.tiles.sigIsNeeded }}
       volumes:
+    {{- if eq (upper .Values.env.storageProvider) "FS" }}
       - name: sources-storage
         persistentVolumeClaim:
           claimName: {{ .Values.storage.internalPvc.name }}
+    {{- end }}
+    {{- if .Values.env.tiles.sigIsNeeded }}
+      - name: key-file
+        configMap:
+          name: {{ .Release.Name }}-{{ $chartName }}-configmap
+          items:
+          - key: "PRIVATE_KEY"
+            path: "private_key.pem"
+    {{- end }}
+    {{- end }}
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
@@ -57,6 +73,8 @@ spec:
                   name: {{ .Values.env.S3.secret.name }}
                   key: secretAccessKey
             {{- end }}
+            - name: CRYPTO_PEM
+              value: "/usr/src/app/private_key.pem"
           envFrom:
             - configMapRef:
                 name: {{ $releaseName }}-{{ $chartName }}-configmap
@@ -69,10 +87,19 @@ spec:
             httpGet:
               path: /liveness
               port: http
+          {{- if or (eq (upper .Values.env.storageProvider) "FS") .Values.env.tiles.sigIsNeeded }}
           volumeMounts: 
+          {{- if eq (upper .Values.env.storageProvider) "FS" }}
             - name: sources-storage
               mountPath: {{ .Values.storage.internalPvc.mountPath }}
               subPath: tiles
+          {{- end }}
+          {{- if .Values.env.tiles.sigIsNeeded }}
+            - mountPath: "/usr/src/app/private_key.pem"
+              name: key-file
+              subPath: private_key.pem
+          {{- end }}
+          {{- end }}
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}
