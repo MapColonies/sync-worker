@@ -33,11 +33,21 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.cloudProvider.imagePullSecretName | quote }}
     {{- end }}
-    {{- if eq (upper .Values.env.storageProvider) "FS" }}
+    {{- if or (eq (upper .Values.env.storageProvider) "FS") .Values.env.tiles.sigIsNeeded }}
       volumes:
+    {{- if eq (upper .Values.env.storageProvider) "FS" }}
       - name: sources-storage
         persistentVolumeClaim:
           claimName: {{ .Values.storage.internalPvc.name }}
+    {{- end }}
+    {{- if .Values.env.tiles.sigIsNeeded }}
+      - name: key-file
+        configMap:
+          name: {{ .Release.Name }}-{{ $chartName }}-configmap
+          items:
+          - key: "PRIVATE_KEY"
+            path: "private_key.pem"
+    {{- end }}
     {{- end }}
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
@@ -63,6 +73,8 @@ spec:
                   name: {{ .Values.env.S3.secret.name }}
                   key: secretAccessKey
             {{- end }}
+            - name: CRYPTO_PEM
+              value: "/usr/src/app/private_key.pem"
           envFrom:
             - configMapRef:
                 name: {{ $releaseName }}-{{ $chartName }}-configmap
@@ -75,11 +87,18 @@ spec:
             httpGet:
               path: /liveness
               port: http
-          {{- if eq (upper .Values.env.storageProvider) "FS" }}
+          {{- if or (eq (upper .Values.env.storageProvider) "FS") .Values.env.tiles.sigIsNeeded }}
           volumeMounts: 
+          {{- if eq (upper .Values.env.storageProvider) "FS" }}
             - name: sources-storage
               mountPath: {{ .Values.storage.internalPvc.mountPath }}
               subPath: tiles
+          {{- end }}
+          {{- if .Values.env.tiles.sigIsNeeded }}
+            - mountPath: "/usr/src/app/private_key.pem"
+              name: key-file
+              subPath: private_key.pem
+          {{- end }}
           {{- end }}
           {{- if .Values.resources.enabled }}
           resources:

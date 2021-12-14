@@ -52,10 +52,10 @@ env:
     path: /layerSources
     format: png
     uploadBatchSize: 100
-    sigIsNeeded: false
+    sigIsNeeded: true
   crypto:
     readFileEncoding: ""
-    pem: ""
+    pem: "path/to/key/file"
     algoritm: ""
     shaSize: ""
   queue:
@@ -66,7 +66,7 @@ env:
     jobType: "Sync"
     tilesTaskType: "tilesSync"
     tocTaskType: "tocSync"
-  storageProvider: "FS"
+  storageProvider: "fs"
   useStreams: true
   S3:
     endpoint: "http://localhost:9000"
