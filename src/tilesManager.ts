@@ -22,6 +22,7 @@ export class TilesManager {
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       this.logger.error(`tiles count=${tilesCount}, update failed for layerId=${layerId}, target=${target}, with error: ${error}`);
+      throw error;
     }
   }
 

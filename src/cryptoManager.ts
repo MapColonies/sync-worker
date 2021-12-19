@@ -13,14 +13,15 @@ interface IEncryptedHash {
 
 @singleton()
 export class CryptoManager {
-  private readonly key: string;
+  private readonly key: Buffer | undefined;
+
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CRYPTO_CONFIG) private readonly cryptoConfig: ICryptoConfig,
     @inject(Services.CONFIG) config: IConfig
   ) {
     this.logger = logger;
-    this.key = config.get<boolean>('tiles.sigIsNeeded') ? this.readKeyFile(this.cryptoConfig.pem) : '';
+    this.key = config.get<boolean>('tiles.sigIsNeeded') ? this.readKeyFile(this.cryptoConfig.pem) : undefined;
   }
 
   public signStream(fullPath: string, stream: Readable): Readable {
@@ -73,7 +74,7 @@ export class CryptoManager {
   private readonly encryptHash = (fileHash: Buffer): IEncryptedHash => {
     const ivSize = 16;
     const iv = Buffer.allocUnsafe(ivSize);
-    const cipher = crypto.createCipheriv(this.cryptoConfig.algoritm, this.key, iv);
+    const cipher = crypto.createCipheriv(this.cryptoConfig.algoritm, this.key as Buffer, iv);
     const sig = cipher.update(fileHash);
 
     const encryptedHash: IEncryptedHash = {
@@ -84,9 +85,9 @@ export class CryptoManager {
     return encryptedHash;
   };
 
-  private readKeyFile(filePath: string): string {
+  private readKeyFile(filePath: string): Buffer {
     try {
-      const key = readFileSync(filePath, { encoding: 'utf8' });
+      const key = readFileSync(filePath);
       return key;
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
