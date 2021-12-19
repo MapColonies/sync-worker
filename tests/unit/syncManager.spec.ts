@@ -296,11 +296,10 @@ describe('syncManager', () => {
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(ackStubForTileTasks).toHaveBeenCalledTimes(1);
+      expect(ackStubForTileTasks).toHaveBeenCalledTimes(0);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(1);
       expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
-      expect(rejectStubForTileTasks).toHaveBeenCalledTimes(0);
-      expect(ackStubForTileTasks).toHaveBeenCalledWith(task.jobId, task.id);
+      expect(rejectStubForTileTasks).toHaveBeenCalledTimes(1);
     });
 
     it('should not sign and upload file if its not exists with streams', async function () {
@@ -318,11 +317,10 @@ describe('syncManager', () => {
       expect(updateTilesCountStub).toHaveBeenCalledTimes(1);
       expect(generateSignedFileStub).toHaveBeenCalledTimes(0);
       expect(uploadTilesStub).toHaveBeenCalledTimes(0);
-      expect(ackStubForTileTasks).toHaveBeenCalledTimes(1);
+      expect(ackStubForTileTasks).toHaveBeenCalledTimes(0);
       expect(tilesGeneratorStub).toHaveBeenCalledTimes(1);
       expect(notifyNifiOnCompleteStub).toHaveBeenCalledTimes(1);
-      expect(rejectStubForTileTasks).toHaveBeenCalledTimes(0);
-      expect(ackStubForTileTasks).toHaveBeenCalledWith(task.jobId, task.id);
+      expect(rejectStubForTileTasks).toHaveBeenCalledTimes(1);
     });
 
     it('should reject task due max attempts with buffers', async function () {
