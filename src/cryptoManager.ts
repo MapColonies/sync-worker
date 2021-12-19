@@ -13,14 +13,15 @@ interface IEncryptedHash {
 
 @singleton()
 export class CryptoManager {
-  private readonly key: Buffer;
+  private readonly key: Buffer | undefined;
+
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CRYPTO_CONFIG) private readonly cryptoConfig: ICryptoConfig,
     @inject(Services.CONFIG) config: IConfig
   ) {
     this.logger = logger;
-    this.key = config.get<boolean>('tiles.sigIsNeeded') ? this.readKeyFile(this.cryptoConfig.pem) : Buffer.from('');
+    this.key = config.get<boolean>('tiles.sigIsNeeded') ? this.readKeyFile(this.cryptoConfig.pem) : undefined;
   }
 
   public signStream(fullPath: string, stream: Readable): Readable {
@@ -73,7 +74,7 @@ export class CryptoManager {
   private readonly encryptHash = (fileHash: Buffer): IEncryptedHash => {
     const ivSize = 16;
     const iv = Buffer.allocUnsafe(ivSize);
-    const cipher = crypto.createCipheriv(this.cryptoConfig.algoritm, this.key, iv);
+    const cipher = crypto.createCipheriv(this.cryptoConfig.algoritm, this.key as Buffer, iv);
     const sig = cipher.update(fileHash);
 
     const encryptedHash: IEncryptedHash = {
