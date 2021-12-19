@@ -102,10 +102,12 @@ export class SyncManager {
           }
           await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         } catch (error) {
+          this.logger.error(`failed to handle tiles task ${(error as Error).message}`);
           await this.queueClient.queueHandlerForTileTasks.reject(jobId, taskId, true, (error as Error).message);
           await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
         }
       } else {
+        this.logger.error(`failed to handle tiles task - max syncAttempts reached: ${this.syncAttempts}`);
         await this.queueClient.queueHandlerForTileTasks.reject(jobId, taskId, false);
         await this.nifiClient.notifyNifiOnComplete(jobId, layerId);
       }
