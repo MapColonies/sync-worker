@@ -10,6 +10,7 @@ yarn-error.log*
 lerna-debug.log*
 
 config/*local*.json
+*local*.yaml
 
 .idea
 
