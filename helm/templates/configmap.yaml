@@ -29,9 +29,9 @@ data:
   TILES_UPLOAD_BATCH_SIZE: {{ .Values.env.tiles.uploadBatchSize | quote }}
   TILES_SIG_IS_NEEDED: {{ .Values.env.tiles.sigIsNeeded | quote }}
   QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl | quote }}
-  QUEUE_HEART_BEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatIntervalMs | quote }}
+  QUEUE_HEART_BEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatManagerBaseUrl | quote }}
   QUEUE_DEQUEUE_INTERVAL_MS: {{ .Values.env.queue.dequeueIntervalMs | quote }}
-  QUEUE_HEART_BEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatManagerBaseUrl | quote }}
+  QUEUE_HEART_BEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs | quote }}
   QUEUE_JOB_TYPE: {{ .Values.env.queue.jobType | quote }}
   QUEUE_TILES_TASK_TYPE: {{ .Values.env.queue.tilesTaskType | quote }}
   QUEUE_TOC_TASK_TYPE: {{ .Values.env.queue.tocTaskType | quote }}
