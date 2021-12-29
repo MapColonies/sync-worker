@@ -20,5 +20,6 @@ export function getProviders(config: IConfig, logger: Logger): InjectionObject<u
       logger.error(`invalid storage provider configuration: ${storageProviderType}`);
       throw new Error(`invalid storage provider configuration: ${storageProviderType}`);
   }
+  logger.info(`using ${storageProviderType} storage provider`);
   return providers;
 }
