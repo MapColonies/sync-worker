@@ -52,7 +52,7 @@ export class S3StorageProvider implements IStorageProvider {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       Bucket: this.s3Config.bucket,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      Key: path,
+      Key: this.fixWinPath(path),
     };
 
     return this.s3
@@ -82,8 +82,15 @@ export class S3StorageProvider implements IStorageProvider {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       Bucket: this.s3Config.bucket,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      Key: key,
+      Key: this.fixWinPath(key),
     };
     return this.s3.getObject(options);
   };
+
+  private fixWinPath(path: string): string {
+    if (process.platform === 'win32') {
+      return path.replace(/\\/g, '/');
+    }
+    return path;
+  }
 }
