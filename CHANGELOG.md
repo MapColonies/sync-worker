@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.3](https://github.com/MapColonies/sync-worker/compare/v1.7.2...v1.7.3) (2021-12-29)
+
+
+### Bug Fixes
+
+* Helm fixes ([#18](https://github.com/MapColonies/sync-worker/issues/18)) ([5f43322](https://github.com/MapColonies/sync-worker/commit/5f433229762e869b7624857816ba23fc68f5364b))
+
 ### [1.7.2](https://github.com/MapColonies/sync-worker/compare/v1.7.0...v1.7.2) (2021-12-19)
 
 
