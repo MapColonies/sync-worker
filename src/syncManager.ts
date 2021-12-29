@@ -4,29 +4,12 @@ import { inject, singleton } from 'tsyringe';
 import { tilesGenerator } from '@map-colonies/mc-utils/dist/geo/tilesGenerator';
 import { QueueClient } from './clients/queueClient';
 import { Services } from './common/constants';
-import { IConfig, ITilesConfig } from './common/interfaces';
+import { IConfig, IParameters, ITilesConfig } from './common/interfaces';
 import { CryptoManager } from './cryptoManager';
 import { TilesManager } from './tilesManager';
 import { NifiClient } from './clients/services/nifiClient';
 import { GatewayClient } from './clients/services/gatewayClient';
 import { IStorageProvider } from './providers/iStorageProvider';
-
-interface ITileRange {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-  zoom: number;
-}
-
-interface IParameters {
-  batch: ITileRange[];
-  resourceId: string;
-  resourceVersion: string;
-  layerRelativePath: string;
-  target: string;
-  tocData?: Record<string, unknown>;
-}
 
 @singleton()
 export class SyncManager {
@@ -55,10 +38,10 @@ export class SyncManager {
   }
 
   public async handleTilesTask(): Promise<boolean> {
-    const tilesTask = await this.queueClient.queueHandlerForTileTasks.dequeue();
+    const tilesTask = await this.queueClient.queueHandlerForTileTasks.dequeue<IParameters>();
     if (tilesTask) {
-      const params = tilesTask.parameters as IParameters;
-      const jobId = tilesTask.jobId;
+      const params = tilesTask.parameters;
+      const jobId = tilesTask.jobId as string;
       const taskId = tilesTask.id;
       const batch = params.batch;
       const target = params.target;
@@ -68,7 +51,7 @@ export class SyncManager {
 
       if (attempts <= this.syncAttempts) {
         try {
-          this.logger.info(`Running sync tiles task for taskId: ${tilesTask.id}, on jobId=${tilesTask.jobId}, attempt: ${attempts}`);
+          this.logger.info(`Running sync tiles task for taskId: ${tilesTask.id}, on jobId=${jobId}, attempt: ${attempts}`);
           const generator = tilesGenerator(batch);
           let batchArray = [];
           let uploadedTiles = 0;
@@ -121,7 +104,7 @@ export class SyncManager {
     const tocTask = await this.queueClient.queueHandlerForTocTasks.dequeue();
     if (tocTask) {
       const params = tocTask.parameters as IParameters;
-      const jobId = tocTask.jobId;
+      const jobId = tocTask.jobId as string;
       const taskId = tocTask.id;
       const attempts = tocTask.attempts;
       const layerId = `${params.resourceId}-${params.resourceVersion}`;
@@ -129,7 +112,7 @@ export class SyncManager {
 
       if (attempts <= this.syncAttempts) {
         try {
-          this.logger.info(`Running sync TOC task for taskId: ${tocTask.id}, on jobId=${tocTask.jobId}, attempt: ${attempts}`);
+          this.logger.info(`Running sync TOC task for taskId: ${tocTask.id}, on jobId=${jobId}, attempt: ${attempts}`);
           const tocContentString = JSON.stringify(params.tocData);
           this.logger.info(`sign and upload toc data ${tocContentString}`);
           const tocContentBuffer = Buffer.from(tocContentString);
