@@ -79,6 +79,8 @@ export class SyncManager {
 
             if (await this.storageProvider.exist(fullPath)) {
               batchArray.push(this.signAndUpload(fullPath, tileRelativePath));
+            } else {
+              this.logger.debug(`tile not found: ${fullPath}`);
             }
 
             if (batchArray.length === this.tilesConfig.uploadBatchSize) {
