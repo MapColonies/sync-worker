@@ -42,7 +42,7 @@ describe('nifiClient', () => {
       const layerId = `${params.resourceId}-${params.resourceVersion}`;
 
       // expectation;
-      await expect(nifiClient.notifyNifiOnComplete(task.jobId, layerId)).resolves.not.toThrow();
+      await expect(nifiClient.notifyNifiOnComplete(task.jobId as string, layerId)).resolves.not.toThrow();
       expect(axiosMocks.post).toHaveBeenCalledTimes(1);
     });
   });

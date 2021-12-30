@@ -1,9 +1,10 @@
-import { ITaskResponse, TaskStatus } from '@map-colonies/mc-priority-queue';
+import { ITaskResponse, OperationStatus } from '@map-colonies/mc-priority-queue';
 import { cloneDeep } from 'lodash';
+import { IParameters } from '../../../src/common/interfaces';
 
-const task: ITaskResponse = {
+const task = {
   id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
-  status: TaskStatus.PENDING,
+  status: OperationStatus.PENDING,
   percentage: 0,
   description: '',
   created: '',
@@ -25,9 +26,9 @@ const task: ITaskResponse = {
       },
     ],
   },
-};
+} as ITaskResponse<IParameters>;
 
-function getTask(): ITaskResponse {
+function getTask(): ITaskResponse<IParameters> {
   return cloneDeep(task);
 }
 

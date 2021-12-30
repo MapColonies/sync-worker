@@ -44,3 +44,20 @@ export interface IGatewayAuthConfig {
   username: string;
   password: string;
 }
+
+export interface ITileRange {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+  zoom: number;
+}
+
+export interface IParameters {
+  batch: ITileRange[];
+  resourceId: string;
+  resourceVersion: string;
+  layerRelativePath: string;
+  target: string;
+  tocData?: Record<string, unknown>;
+}
