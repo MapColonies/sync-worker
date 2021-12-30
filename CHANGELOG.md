@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.4](https://github.com/MapColonies/sync-worker/compare/v1.7.3...v1.7.4) (2021-12-30)
+
+
+### Bug Fixes
+
+* s3 Win compatibility ([#20](https://github.com/MapColonies/sync-worker/issues/20)) ([e421dd5](https://github.com/MapColonies/sync-worker/commit/e421dd57f58ac3b5fde3c9f6dd0e58eff9b72870))
+
 ### [1.7.3](https://github.com/MapColonies/sync-worker/compare/v1.7.2...v1.7.3) (2021-12-29)
 
 
