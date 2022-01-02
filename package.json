@@ -1,6 +1,6 @@
 {
   "name": "sync-worker",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "description": "Synchronizing worker service",
   "main": "./src/index.ts",
   "scripts": {
