@@ -40,6 +40,7 @@ data:
   S3_ENDPOINT: {{ .Values.env.S3.endpoint | quote }}
   S3_BUCKET: {{ .Values.env.S3.bucket | quote }}
   S3_FORCE_PATH_STYLE: {{ .Values.env.S3.forcePathStyle | quote }}
+  S3_SSL_ENABLED: {{ .Values.env.S3.sslEnabled | quote}}
   {{- if .Values.env.tiles.sigIsNeeded }}
   {{ $globdata := .Files.Glob .Values.env.crypto.pem }}
   {{ if $globdata }}

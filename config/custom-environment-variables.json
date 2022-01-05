@@ -101,6 +101,10 @@
     "forcePathStyle": {
       "__name": "S3_FORCE_PATH_STYLE",
       "__format": "boolean"
+    },
+    "sslEnabled": {
+      "__name": "S3_SSL_ENABLED",
+      "__format": "boolean"
     }
   }
 }

@@ -4,4 +4,5 @@ export interface IS3Config {
   endpoint: string;
   bucket: string;
   forcePathStyle: boolean;
+  sslEnabled: boolean;
 }
