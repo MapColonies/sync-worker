@@ -72,6 +72,7 @@ env:
     endpoint: "http://localhost:9000"
     bucket: "mapping-images"
     forcePathStyle: true
+    sslEnabled: true
     secret:
       name: raster-tiles-s3-secret
       createSecret: false # secret should be created on higher level for deployments with multiple services

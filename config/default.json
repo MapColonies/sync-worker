@@ -69,8 +69,9 @@
   "S3": {
     "accessKeyId": "minioadmin",
     "secretAccessKey": "minioadmin",
-    "endpoint": "http://localhost:9000",
+    "endpoint": "localhost:9000",
     "bucket": "mapping-images",
-    "forcePathStyle": true
+    "forcePathStyle": true,
+    "sslEnabled": false
   }
 }

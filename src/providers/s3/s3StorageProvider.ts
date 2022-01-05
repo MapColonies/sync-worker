@@ -22,6 +22,7 @@ export class S3StorageProvider implements IStorageProvider {
       },
       endpoint: this.s3Config.endpoint,
       s3ForcePathStyle: this.s3Config.forcePathStyle,
+      sslEnabled: this.s3Config.sslEnabled,
     });
   }
 
