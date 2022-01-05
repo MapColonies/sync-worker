@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.9](https://github.com/MapColonies/sync-worker/compare/v1.7.7...v1.7.9) (2022-01-05)
+
+
+### Bug Fixes
+
+* s3 ssl configuration ([#24](https://github.com/MapColonies/sync-worker/issues/24)) ([1e3602f](https://github.com/MapColonies/sync-worker/commit/1e3602f74fd08aa538349010be9d1243c169551c))
+
 ### [1.7.7](https://github.com/MapColonies/sync-worker/compare/v1.7.6...v1.7.7) (2022-01-03)
 
 ### [1.7.6](https://github.com/MapColonies/sync-worker/compare/v1.7.5...v1.7.6) (2022-01-03)
