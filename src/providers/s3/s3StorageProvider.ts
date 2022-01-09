@@ -22,6 +22,7 @@ export class S3StorageProvider implements IStorageProvider {
       },
       endpoint: this.s3Config.endpoint,
       s3ForcePathStyle: this.s3Config.forcePathStyle,
+      sslEnabled: this.s3Config.sslEnabled,
     });
   }
 
@@ -61,7 +62,12 @@ export class S3StorageProvider implements IStorageProvider {
       .then(() => {
         return true;
       })
-      .catch(() => {
+      .catch((err) => {
+        const error = err as AWSError;
+        this.logger.debug(`cant access file in s3: ${error.message}`);
+        if (error.statusCode !== httpStatusCode.NOT_FOUND) {
+          throw err;
+        }
         return false;
       });
   }

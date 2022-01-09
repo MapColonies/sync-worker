@@ -119,11 +119,11 @@ describe('s3StorageProvider', () => {
       expect(getS3ObjectMock).toHaveBeenCalledTimes(0);
     });
 
-    it('return false on file access error', async () => {
+    it('return false on file not found error', async () => {
       //mock
       const filePath = 'testFile';
       headObjectPromiseMock.mockImplementation(async () => {
-        return Promise.reject(new Error('test error'));
+        return Promise.reject({ ...new Error('test error'), statusCode: httpStatusCode.NOT_FOUND });
       });
       //action
       const res = await provider.exist(filePath);
