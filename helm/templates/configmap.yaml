@@ -22,9 +22,10 @@ data:
   LAYER_SPEC_BASE_URL: {{ .Values.env.layerSpecBaseUrl | quote }}
   NIFI_BASE_URL: {{ .Values.env.nifiBaseUrl | quote }}
   SYNC_ATTEMPTS: {{ .Values.env.syncAttempts | quote }}
-  GATEWAY_URL: {{ .Values.env.gatewayUrl | quote }}
-  GATEWAY_IMAGE_ROUTE_ID: {{ .Values.env.gatewayImageRouteId | quote }}
-  GATEWAY_JSON_ROUTE_ID: {{ .Values.env.gatewayJsonRouteId | quote }}
+  GATEWAY_URL: {{ .Values.env.gateway.url | quote }}
+  GATEWAY_IMAGE_ROUTE_ID: {{ .Values.env.gateway.imageRouteId | quote }}
+  GATEWAY_JSON_ROUTE_ID: {{ .Values.env.gateway.jsonRouteId | quote }}
+  GATEWAY_AUTH_ENABLED: {{ .Values.env.gateway.auth.enabled | quote }}
   TILES_PATH: {{ .Values.env.tiles.path | quote }}
   TILES_UPLOAD_BATCH_SIZE: {{ .Values.env.tiles.uploadBatchSize | quote }}
   TILES_SIG_IS_NEEDED: {{ .Values.env.tiles.sigIsNeeded | quote }}
@@ -40,12 +41,4 @@ data:
   S3_ENDPOINT: {{ .Values.env.S3.endpoint | quote }}
   S3_BUCKET: {{ .Values.env.S3.bucket | quote }}
   S3_FORCE_PATH_STYLE: {{ .Values.env.S3.forcePathStyle | quote }}
-  {{- if .Values.env.tiles.sigIsNeeded }}
-  {{ $globdata := .Files.Glob .Values.env.crypto.pem }}
-  {{ if $globdata }}
-  PRIVATE_KEY: {{ tpl (.Files.Get .Values.env.crypto.pem) . | quote }}
-  {{ else }}
-  {{- fail  (printf "Key file not found at path: %s" .Values.env.crypto.pem) }}
-  {{- end }}
-  {{- end }}
 {{- end }}

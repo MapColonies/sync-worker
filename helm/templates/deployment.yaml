@@ -43,8 +43,8 @@ spec:
     {{- end }}
     {{- if .Values.env.tiles.sigIsNeeded }}
       - name: key-file
-        configMap:
-          name: {{ .Release.Name }}-{{ $chartName }}-configmap
+        secret:
+          secretName: {{ .Values.gateway.secretName }}
           items:
           - key: "PRIVATE_KEY"
             path: "private_key.pem"
@@ -69,6 +69,18 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.env.S3.secret.name }}
                   key: secretAccessKey
+            {{- end }}
+            {{- if .Values.env.gateway.auth.enabled }}
+            - name: GATEWAY_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gateway.secretName }}
+                  key: username
+            - name: GATEWAY_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gateway.secretName }}
+                  key: password
             {{- end }}
             - name: CRYPTO_PEM
               value: "/usr/src/app/private_key.pem"

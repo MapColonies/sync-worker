@@ -28,6 +28,9 @@ storage:
     name: "internal-pv"
     directory: "/layerSources"
 
+gateway:
+  secretName: gateway-basic-auth-secret
+
 env:
   port: 8089
   targetPort: 8089
@@ -45,9 +48,14 @@ env:
   layerSpecBaseUrl: "http://localhost:8080"
   nifiBaseUrl: "http://localhost:8083"
   syncAttempts: 3
-  gatewayUrl: "http://localhost:8084"
-  gatewayImageRouteId: ""
-  gatewayJsonRouteId: ""
+  gateway:
+    url: 'http://localhost:8084'
+    imageRouteId: ''
+    jsonRouteId: ''
+    auth:
+      enabled: true
+      username: ''
+      password: ''
   tiles:
     path: ''
     format: png
@@ -75,8 +83,8 @@ env:
     secret:
       name: raster-tiles-s3-secret
       createSecret: false # secret should be created on higher level for deployments with multiple services
-      accessKeyId: # used only when creating secret
-      secretAccessKey: # used only when creating secret
+      accessKeyId: '' # used only when creating secret
+      secretAccessKey: '' # used only when creating secret
 resources:
   enabled: false
   value:
