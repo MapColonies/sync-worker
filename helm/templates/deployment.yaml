@@ -44,7 +44,7 @@ spec:
     {{- if .Values.env.tiles.sigIsNeeded }}
       - name: key-file
         secret:
-          secretName: {{ .Values.gateway.secretName }}
+          secretName: {{ .Values.gateway.secret.name }}
           items:
           - key: "PRIVATE_KEY"
             path: "private_key.pem"
@@ -74,12 +74,12 @@ spec:
             - name: GATEWAY_AUTH_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gateway.secretName }}
+                  name: {{ .Values.gateway.secret.name }}
                   key: username
             - name: GATEWAY_AUTH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gateway.secretName }}
+                  name: {{ .Values.gateway.secret.name }}
                   key: password
             {{- end }}
             - name: CRYPTO_PEM

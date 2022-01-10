@@ -29,7 +29,9 @@ storage:
     directory: "/layerSources"
 
 gateway:
-  secretName: gateway-basic-auth-secret
+  secret: 
+    create: true # secret should be created on higher level for deployments with multiple services
+    name: gateway-basic-auth-secret
 
 env:
   port: 8089
@@ -53,14 +55,14 @@ env:
     imageRouteId: ''
     jsonRouteId: ''
     auth:
-      enabled: true
+      enabled: false
       username: ''
       password: ''
   tiles:
     path: ''
     format: png
     uploadBatchSize: 100
-    sigIsNeeded: true
+    sigIsNeeded: false
   crypto:
     readFileEncoding: ""
     pem: "path/to/key/file"
