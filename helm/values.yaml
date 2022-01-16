@@ -4,6 +4,25 @@ global:
   metrics: {}
   environment: {}
 
+authentication:
+  ca:
+    enabled: false
+    useExternal: false
+    externalSecretName: ""
+  ssl:
+    enabled: false
+    useExternal: false
+    externalSecretName: ""
+
+# ====================================================================================================
+# Local certificate files variables
+# ====================================================================================================
+
+local:
+  certs:
+    ca: "certs/ca.crt"
+    ssl: "certs/ssl.crt"
+
 enabled: true
 environment: "development"
 replicaCount: 1
@@ -30,7 +49,7 @@ storage:
 
 gateway:
   secret: 
-    create: true # secret should be created on higher level for deployments with multiple services
+    create: false # secret should be created on higher level for deployments with multiple services
     name: gateway-basic-auth-secret
 
 env:
