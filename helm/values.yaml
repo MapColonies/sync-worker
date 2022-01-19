@@ -21,7 +21,7 @@ authentication:
 local:
   certs:
     ca: "certs/ca.crt"
-    ssl: "certs/ssl.crt"
+    ssl: "certs/openssl.cnf"
 
 enabled: true
 environment: "development"
@@ -108,7 +108,7 @@ env:
       accessKeyId: '' # used only when creating secret
       secretAccessKey: '' # used only when creating secret
 resources:
-  enabled: false
+  enabled: true
   value:
     limits:
       cpu: "100m"
