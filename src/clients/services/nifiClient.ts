@@ -21,6 +21,6 @@ export class NifiClient extends HttpClient {
       jobId: jobId,
     };
     this.logger.info(`Updating Nifi on complete for jobId=${jobId} layerId=${layerId}`);
-    await this.post(`/status`, body);
+    await this.post(`/synchronize/status`, body);
   }
 }
