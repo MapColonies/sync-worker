@@ -16,3 +16,5 @@ export enum Services {
   GATEWAY_CONFIG = 'IGatewayConfig',
   STORAGE_PROVIDER = 'storageProvider',
 }
+
+export const FILENAME_SAPERATOR_CHARACTER = '~~';
