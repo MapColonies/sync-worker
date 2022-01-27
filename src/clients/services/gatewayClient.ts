@@ -37,11 +37,17 @@ export class GatewayClient extends HttpClient {
     const addedHeaders = {
       'content-type': 'application/octet-stream',
     };
+    const acceptableFilename = this.gwAcceptableFilename(filename);
+
     const queryParams = {
-      filename: encodeURIComponent(filename),
+      filename: acceptableFilename,
       routeID: routeId,
       filesize: (data as Buffer).length || (data as Readable).readableLength,
     };
     await this.post('', data, queryParams, undefined, this.authOptions, addedHeaders);
+  }
+
+  private gwAcceptableFilename(filename: string): string {
+    return filename.replace(/\//g, '~~');
   }
 }
