@@ -39,8 +39,9 @@ export class GatewayClient extends HttpClient {
     };
     const queryParams = {
       filename: encodeURIComponent(filename),
-      routeId: routeId,
+      routeID: routeId,
+      filesize: (data as Buffer).length || (data as Readable).readableLength,
     };
-    await this.post('/', data, queryParams, undefined, this.authOptions, addedHeaders);
+    await this.post('', data, queryParams, undefined, this.authOptions, addedHeaders);
   }
 }

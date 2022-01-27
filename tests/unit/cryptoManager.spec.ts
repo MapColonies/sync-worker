@@ -83,7 +83,7 @@ describe('cryptoManager', () => {
       };
       // expectation;
       expect(action).not.toThrow();
-      expect(concatStub).toHaveBeenCalledTimes(2);
+      expect(concatStub).toHaveBeenCalledTimes(1);
       expect(createCipherivStub).toHaveBeenCalledTimes(1);
     });
 
