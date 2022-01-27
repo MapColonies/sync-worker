@@ -54,8 +54,7 @@ export class CryptoManager {
       const fileHash = this.computeHash(buffer);
       const encryptedHash = this.encryptHash(fileHash);
       this.logger.debug(`appending iv and signature into generated file from: ${fullPath}`);
-      buffer = Buffer.concat([buffer, encryptedHash.iv]);
-      buffer = Buffer.concat([buffer, encryptedHash.sig]);
+      buffer = Buffer.concat([buffer, encryptedHash.iv, encryptedHash.sig]);
       return buffer;
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -76,6 +75,7 @@ export class CryptoManager {
     const iv = Buffer.allocUnsafe(ivSize);
     const cipher = crypto.createCipheriv(this.cryptoConfig.algoritm, this.key as Buffer, iv);
     const sig = cipher.update(fileHash);
+    cipher.final();
 
     const encryptedHash: IEncryptedHash = {
       iv,

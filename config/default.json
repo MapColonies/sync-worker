@@ -48,7 +48,7 @@
     "readFileEncoding": "ascii",
     "pem": "/path/to/private_key.pem",
     "shaSize": "sha512",
-    "algoritm": "aes-256-cfb"
+    "algoritm": "AES-256-CFB8"
   },
   "queue": {
     "jobManagerBaseUrl": "http://localhost:8082",

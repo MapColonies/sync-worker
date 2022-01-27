@@ -4,7 +4,7 @@ import { Logger } from '@map-colonies/js-logger';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
 import { AxiosBasicCredentials } from 'axios';
 import { IGatewayAuthConfig, IConfig } from '../../common/interfaces';
-import { Services } from '../../common/constants';
+import { FILENAME_SAPERATOR_CHARACTER, Services } from '../../common/constants';
 
 @singleton()
 export class GatewayClient extends HttpClient {
@@ -37,10 +37,17 @@ export class GatewayClient extends HttpClient {
     const addedHeaders = {
       'content-type': 'application/octet-stream',
     };
+    const acceptableFilename = this.gwAcceptableFilename(filename);
+
     const queryParams = {
-      filename: encodeURIComponent(filename),
-      routeId: routeId,
+      filename: acceptableFilename,
+      routeID: routeId,
+      filesize: (data as Buffer).length || (data as Readable).readableLength,
     };
-    await this.post('/', data, queryParams, undefined, this.authOptions, addedHeaders);
+    await this.post('', data, queryParams, undefined, this.authOptions, addedHeaders);
+  }
+
+  private gwAcceptableFilename(filename: string): string {
+    return filename.replace(/\//g, FILENAME_SAPERATOR_CHARACTER);
   }
 }
