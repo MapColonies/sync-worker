@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.10](https://github.com/MapColonies/sync-worker/compare/v1.7.9...v1.7.10) (2022-01-27)
+
+
+### Bug Fixes
+
+* change ni-fi client route ([#27](https://github.com/MapColonies/sync-worker/issues/27)) ([70c2bf1](https://github.com/MapColonies/sync-worker/commit/70c2bf1fb84b0fce080832e5d8f03f306396f993))
+* integration with gateway ([#28](https://github.com/MapColonies/sync-worker/issues/28)) ([d1d1411](https://github.com/MapColonies/sync-worker/commit/d1d1411641ce501b607af0d64b8e7bc465ea2ae3))
+
 ### [1.7.9](https://github.com/MapColonies/sync-worker/compare/v1.7.7...v1.7.9) (2022-01-05)
 
 
