@@ -32,7 +32,7 @@ nodePort: 30030 #for minikube deployment only
 cloudProvider:
   dockerRegistryUrl: "my-registry"
   imagePullSecretName: "my-registry-secret"
-  flavor: "azure"
+  flavor: "openshift"
 
 image:
   repository: "sync-worker"
@@ -56,7 +56,7 @@ env:
   port: 8089
   targetPort: 8089
   protocol: TCP
-  logLevel: debug
+  logLevel: warn
   logPrettyPrintEnabled: false
   responseCompressionEnabled: true
   requestPayloadLimit: 1mb
